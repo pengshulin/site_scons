@@ -1,0 +1,13 @@
+This is my scons build scripts for embedded processors
+try ./install to make symbolic links to ~/.scons
+
+current supports:
+* STM32F1
+* STM32L1
+
+
+
+
+
+Shulin Peng <trees_peng@163.com>
+

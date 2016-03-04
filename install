@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Peng Shulin <trees_peng@163.com>
+
+
+# make symbol link to ~/.scons/site_scons directory
+# delete if symbolic link exists
+test -h ~/.scons/site_scons && echo 'Delete existing symbol link' && \
+    rm ~/.scons/site_scons
+# bakup if normal file exists
+test -f ~/.scons/site_scons && echo 'Backup existing normal file' && \
+    mv ~/.scons/site_scons `mktemp -u --tmpdir=$HOME/.scons site_scons.XXXX`
+# bakup if normal directory exists
+test -d ~/.scons/site_scons && echo 'Backup existing normal directory' && \
+    mv ~/.scons/site_scons `mktemp -u -d --tmpdir=$HOME/.scons site_scons.XXXX`
+ 
+# make new link
+echo 'Make symbolic link'
+ln -s `pwd`/site_scons ~/.scons/site_scons
+
+
