@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Peng Shulin <trees_peng@163.com>
 
+# test if .scons exists
+test ! -e ~/.scons && echo 'Create .scons directory' && mkdir ~/.scons
 
 # make symbol link to ~/.scons/site_scons directory
 # delete if symbolic link exists
