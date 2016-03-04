@@ -1,6 +1,5 @@
 '''stm32 series'''
 from os.path import join
-
 from CortexM3 import CortexM3
 
 class Stm32(CortexM3):
