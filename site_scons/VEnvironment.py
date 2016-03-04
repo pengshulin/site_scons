@@ -39,11 +39,17 @@ class VEnvironment(Environment):
         self.Append( LIBPATH=self._LIBPATH )
         self.Append( LINKFLAGS=self._LINKFLAGS )
 
-        BIN_BUILDER = Builder( action = tool.OBJCOPY + ' -O binary $SOURCE $TARGET' )
+        BIN_BUILDER = Builder( action = tool.OBJCOPY + ' -O binary $SOURCE $TARGET', suffix='.bin', src_suffix='.elf' )
         self.Append( BUILDERS={'Bin': BIN_BUILDER} )
 
-        HEX_BUILDER = Builder( action = tool.OBJCOPY + ' -O ihex $SOURCE $TARGET' )
+        HEX_BUILDER = Builder( action = tool.OBJCOPY + ' -O ihex $SOURCE $TARGET', suffix='.hex', src_suffix='.elf' )
         self.Append( BUILDERS={'Hex': HEX_BUILDER} )
+        
+        SIZE_BUILDER = Builder( action = tool.SIZE + ' $SOURCE', src_suffix='.elf' )
+        self.Append( BUILDERS={'Size': SIZE_BUILDER} )
+
+        DUMP_BUILDER = Builder( action = tool.OBJDUMP + ' -x -S -D -s $SOURCE $TARGET', suffix='.S', src_suffix='.o' )
+        self.Append( BUILDERS={'Dump': DUMP_BUILDER} )
 
         self.findRoot()
 
@@ -129,6 +135,8 @@ class VEnvironment(Environment):
         hexfile = self.Hex( name + '.hex', elffile )
         self.Depends( binfile, elffile )
         self.Depends( hexfile, elffile )
+        self.Size( source=elffile )
+        # TODO: add obj dumper if needed
 
     def makeLib( self ):
         self.Library( self.getName(), self.source )

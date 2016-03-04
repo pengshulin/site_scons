@@ -10,6 +10,8 @@ class Gcc():
     NM = 'nm'
     RANDLIB = 'randlib'
     OBJCOPY = 'objcopy'
+    OBJDUMP = 'objdump'
+    SIZE = 'size'
 
     def __init__( self, prefix=None ):
         if prefix:
@@ -21,6 +23,8 @@ class Gcc():
         self.NM = self.PREFIX + self.NM
         self.RANDLIB = self.PREFIX + self.RANDLIB
         self.OBJCOPY = self.PREFIX + self.OBJCOPY
+        self.OBJDUMP = self.PREFIX + self.OBJDUMP
+        self.SIZE = self.PREFIX + self.SIZE
 
 class ArmNoneEabiGcc(Gcc):
     PREFIX = 'arm-none-eabi-'
