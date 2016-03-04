@@ -4,6 +4,7 @@ try ./install to make symbolic links to ~/.scons
 current supports:
 * STM32F1
 * STM32L1
+* MSP430F47163
 
 
 

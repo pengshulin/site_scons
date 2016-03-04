@@ -28,5 +28,8 @@ class ArmNoneEabiGcc(Gcc):
 class ArmElfGcc(Gcc):
     PREFIX = 'arm-elf-'
 
+class Msp430Gcc(Gcc):
+    PREFIX = 'msp430-'
+
 
 
