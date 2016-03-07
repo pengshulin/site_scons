@@ -1,5 +1,5 @@
 '''stm32 series'''
-from CortexM3 import CortexM3
+from Cortex import CortexM3
 
 class Stm32(CortexM3):
     '''stm32 base class'''
