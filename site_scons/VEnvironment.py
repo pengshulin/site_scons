@@ -29,9 +29,12 @@ class VEnvironment(Environment):
         self['AR'] = tool.AR
         self['AS'] = tool.AS
         self['CC'] = tool.CC
+        self['CXX'] = tool.CXX
         self['LINK'] = tool.LINK
         self['NM'] = tool.NM
         self['RANDLIB'] = tool.RANDLIB
+        self['OBJCOPY'] = tool.OBJCOPY
+        self['OBJDUMP'] = tool.OBJDUMP
 
         self.Append( CCFLAGS=self._CCFLAGS )
         self.Append( CPPPATH=self._CPPPATH )

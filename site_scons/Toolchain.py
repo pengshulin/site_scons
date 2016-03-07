@@ -6,6 +6,7 @@ class Gcc():
     AR = 'ar'
     AS = 'as'
     CC = 'gcc'
+    CXX = 'g++'
     LINK = 'gcc'
     NM = 'nm'
     RANDLIB = 'randlib'
@@ -17,6 +18,7 @@ class Gcc():
         if prefix:
             self.PREFIX = prefix
         self.CC = self.PREFIX + self.CC
+        self.CXX = self.PREFIX + self.CXX
         self.AR = self.PREFIX + self.AR
         self.AS = self.PREFIX + self.AS
         self.LINK = self.PREFIX + self.LINK
