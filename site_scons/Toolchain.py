@@ -26,14 +26,5 @@ class Gcc():
         self.OBJDUMP = self.PREFIX + self.OBJDUMP
         self.SIZE = self.PREFIX + self.SIZE
 
-class ArmNoneEabiGcc(Gcc):
-    PREFIX = 'arm-none-eabi-'
-
-class ArmElfGcc(Gcc):
-    PREFIX = 'arm-elf-'
-
-class Msp430Gcc(Gcc):
-    PREFIX = 'msp430-'
-
 
 

@@ -1,10 +1,12 @@
-'''cortex-m3 based controller'''
-from Toolchain import Msp430Gcc
+'''MSP430 MCUs'''
+from Toolchain import Gcc
 from VEnvironment import VEnvironment
 
+class Msp430Gcc(Gcc):
+    PREFIX = 'msp430-'
 
 class Msp430(VEnvironment):
-    '''base class for cortex-m3'''
+    '''base class for msp430 mcus'''
     mcu = ''
     _TOOLCHAIN = Msp430Gcc
     _CCFLAGS = ['-Wno-unused-but-set-variable', '-Wall', '-mcpu=430x']

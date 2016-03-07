@@ -5,6 +5,7 @@ current supports:
 * STM32F1
 * STM32L1
 * MSP430F47163
+* ATMEGA128
 
 
 

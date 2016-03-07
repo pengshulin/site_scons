@@ -1,7 +1,12 @@
 '''cortex-m3 based controller'''
-from Toolchain import ArmNoneEabiGcc
+from Toolchain import Gcc
 from VEnvironment import VEnvironment
 
+class ArmNoneEabiGcc(Gcc):
+    PREFIX = 'arm-none-eabi-'
+
+class ArmElfGcc(Gcc):
+    PREFIX = 'arm-elf-'
 
 class CortexM3(VEnvironment):
     '''base class for cortex-m3'''
