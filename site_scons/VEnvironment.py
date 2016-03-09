@@ -48,7 +48,7 @@ class VEnvironment(Environment):
         HEX_BUILDER = Builder( action = tool.OBJCOPY + ' -O ihex $SOURCE $TARGET', suffix='.hex', src_suffix='.elf' )
         self.Append( BUILDERS={'Hex': HEX_BUILDER} )
         
-        SIZE_BUILDER = Builder( action = tool.SIZE + ' $SOURCE', src_suffix='.elf' )
+        SIZE_BUILDER = Builder( action = tool.SIZE + ' -t $SOURCE', src_suffix='.elf' )
         self.Append( BUILDERS={'Size': SIZE_BUILDER} )
 
         DUMP_BUILDER = Builder( action = tool.OBJDUMP + ' -x -S -D -s $SOURCE $TARGET', suffix='.S', src_suffix='.o' )
