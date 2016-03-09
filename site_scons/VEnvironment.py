@@ -142,5 +142,6 @@ class VEnvironment(Environment):
         # TODO: add obj dumper if needed
 
     def makeLib( self ):
-        self.Library( self.getName(), self.source )
+        libfile = self.Library( self.getName(), self.source )
+        self.Size( source=libfile )
 
