@@ -127,11 +127,12 @@ class VEnvironment(Environment):
         else:
             self.linkfile = linkfile
          
-    def makeApp( self ):
+    def makeApp( self, name=None ):
         '''make application'''
         if self.linkfile:
             self.appendLinkFlag( ['-T%s'% self.linkfile] )
-        name = self.getName()
+        if not name:
+            name = self.getName()
         self.appendLinkFlag( ['-Wl,-Map,%s.map'% name] )
         elffile = self.Program( name + '.elf', self.source )
         binfile = self.Bin( name + '.bin', elffile )
@@ -141,7 +142,9 @@ class VEnvironment(Environment):
         self.Size( source=elffile )
         # TODO: add obj dumper if needed
 
-    def makeLib( self ):
-        libfile = self.Library( self.getName(), self.source )
+    def makeLib( self, name=None ):
+        if not name:
+            name = self.getName()
+        libfile = self.Library( name, self.source )
         self.Size( source=libfile )
 
