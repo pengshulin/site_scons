@@ -140,7 +140,7 @@ class VEnvironment(Environment):
             result = self.Glob( pat )
         if exclude_pat:
             ret = []
-            for fil in ret:
+            for fil in result:
                 if not fnmatch( str(fil), exclude_pat ):
                     ret.append( fil )
             return ret
