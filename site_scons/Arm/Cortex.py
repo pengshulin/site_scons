@@ -9,11 +9,11 @@ class Cortex(VEnvironment):
     '''base class for cortex'''
     _TOOLCHAIN = ArmNoneEabiGcc
     _MCPU = None
-    _CCFLAGS = ['-Wall']
+    _CCFLAGS = []
     _CPPPATH = []
     _LIBPATH = []
     _LIBS = []
-    _LINKFLAGS = ['-Wl,--gc-sections']
+    _LINKFLAGS = []
 
     def __init__( self ):
         VEnvironment.__init__( self )

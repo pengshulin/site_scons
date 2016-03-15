@@ -9,11 +9,11 @@ class Msp430(VEnvironment):
     '''base class for msp430 mcus'''
     mcu = ''
     _TOOLCHAIN = Msp430Gcc
-    _CCFLAGS = ['-Wno-unused-but-set-variable', '-Wall', '-mcpu=430x']
+    _CCFLAGS = ['-mcpu=430x']
     _CPPPATH = []
     _LIBPATH = []
     _LIBS = []
-    _LINKFLAGS = ['-mcpu=430x', '-Wl,--gc-sections']
+    _LINKFLAGS = ['-mcpu=430x']
 
     def __init__( self ):
         VEnvironment.__init__( self )

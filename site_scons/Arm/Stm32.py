@@ -17,7 +17,8 @@ class Stm32f1(Stm32):
                           '/ST/STM32_USB-FS-Device_Driver/inc', ] )
         self.appendCompilerFlag( ['-DSTM32F10X_%s'% density.upper()] )
         self.appendSource( ['/CMSIS/Device/ST/STM32F10x/Source/Templates/gcc_ride7/startup_stm32f10x_%s.s'% density.lower()] )
-        self.appendGlobSource( '/ST/STM32F10x_StdPeriph_Driver/src/*.c' )
+        self.appendSource( ['/CMSIS/Device/ST/STM32F10x/Source/Templates/system_stm32f10x.c'] )
+        self.appendGlobSource( ['/ST/STM32F10x_StdPeriph_Driver/src/*.c'] )
 
 class Stm32f1xld(Stm32f1):
     def __init__( self ):
@@ -58,7 +59,7 @@ class Stm32f2(Stm32):
                           '/ST/STM32F2xx_StdPeriph_Driver/inc',
                           '/ST/STM32_USB-FS-Device_Driver/inc', ] )
         self.appendSource( ['/CMSIS/Device/ST/STM32F2xx/Source/Templates/gcc_ride7/startup_stm32f2xx.s'] )
-        self.appendGlobSource( '/ST/STM32F2xx_StdPeriph_Driver/src/*.c' )
+        self.appendGlobSource( ['/ST/STM32F2xx_StdPeriph_Driver/src/*.c'] )
 
 class Stm32l1(Stm32):
     def __init__( self,  density='md' ):
@@ -70,7 +71,8 @@ class Stm32l1(Stm32):
                           '/ST/STMTouch_Driver/inc/to adapt', ] )
         self.appendCompilerFlag( ['-DSTM32L1XX_%s'% density.upper()] )
         self.appendSource( ['/CMSIS/Device/ST/STM32L1xx/Source/Templates/gcc_ride7/startup_stm32l1xx_%s.s'% density.lower()] )
-        self.appendGlobSource( '/ST/STM32L1xx_StdPeriph_Driver/src/*.c' )
+        self.appendSource( ['/CMSIS/Device/ST/STM32L1xx/Source/Templates/system_stm32l1xx.c'] )
+        self.appendGlobSource( ['/ST/STM32L1xx_StdPeriph_Driver/src/*.c'] )
  
  
 class Stm32l1md(Stm32l1):

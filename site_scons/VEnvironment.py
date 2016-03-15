@@ -16,11 +16,21 @@ class VEnvironment(Environment):
     linkfile = None
 
     _TOOLCHAIN = Gcc
+
+    # default flags
+    _DEF_CCFLAGS = ['-Wno-unused-but-set-variable', '-Wall']
+    _DEF_CPPPATH = []
+    _DEF_LIBPATH = []
+    _DEF_LIBS = []
+    _DEF_LINKFLAGS = ['-Wl,--gc-sections']
+
+    # additional flags
     _CCFLAGS = []
     _CPPPATH = []
     _LIBPATH = []
     _LIBS = []
     _LINKFLAGS = []
+
 
     def __init__( self ):
         Environment.__init__( self, ENV=environ )
@@ -35,6 +45,12 @@ class VEnvironment(Environment):
         self['RANDLIB'] = tool.RANDLIB
         self['OBJCOPY'] = tool.OBJCOPY
         self['OBJDUMP'] = tool.OBJDUMP
+
+        self.Append( CCFLAGS=self._DEF_CCFLAGS )
+        self.Append( CPPPATH=self._DEF_CPPPATH )
+        self.Append( LIBS=self._DEF_LIBS )
+        self.Append( LIBPATH=self._DEF_LIBPATH )
+        self.Append( LINKFLAGS=self._DEF_LINKFLAGS )
 
         self.Append( CCFLAGS=self._CCFLAGS )
         self.Append( CPPPATH=self._CPPPATH )
@@ -57,9 +73,11 @@ class VEnvironment(Environment):
         self.findRoot()
 
     def appendCompilerFlag( self, flag ):
+        assert isinstance(flag, list) 
         self.Append( CCFLAGS=flag )
 
     def appendLinkFlag( self, flag ):
+        assert isinstance(flag, list) 
         self.Append( LINKFLAGS=flag )
     
     def applyRoot( self, path ):
@@ -73,19 +91,25 @@ class VEnvironment(Environment):
         return ret
 
     def appendPath( self, path ):
+        assert isinstance(path, list) 
         self.Append( CPPPATH=self.applyRoot(path) )
 
     def appendLibPath( self, path ):
+        assert isinstance(path, list) 
         self.Append( LIBPATH=self.applyRoot(path) )
         
     def appendLib( self, lib ):
+        assert isinstance(lib, list) 
         self.Append( LIBS=lib )
 
     def appendSource( self, source ):
+        assert isinstance(source, list) 
         self.source += self.applyRoot(source)
 
     def appendGlobSource( self, pat, expat=None ):
-        self.appendSource( self.glob(pat, expat) )
+        assert isinstance(pat, list) 
+        for p in pat:
+            self.appendSource( self.glob(p, expat) )
 
     def findRoot( self ):
         _dir = abspath(getcwd())
@@ -107,6 +131,9 @@ class VEnvironment(Environment):
             return dirname
 
     def glob( self, pat, exclude_pat=None ):
+        assert isinstance(pat, str) 
+        if exclude_pat is not None:
+            assert isinstance(exclude_pat, str) 
         if pat.startswith('/') and not pat.startswith(self.root):
             result = self.Glob( join(self.root, pat[1:]) )
         else:

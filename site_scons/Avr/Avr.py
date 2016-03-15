@@ -10,12 +10,12 @@ class Avr(VEnvironment):
     '''base class for avr'''
     mcu = ''
     _TOOLCHAIN = AvrGcc
-    _CCFLAGS = ['-Wno-unused-but-set-variable', '-Wall', '-gdwarf-2', '-funsigned-char',
+    _CCFLAGS = ['-gdwarf-2', '-funsigned-char',
                 '-funsigned-bitfields', '-fpack-struct', '-fshort-enums', ]
     _CPPPATH = []
     _LIBPATH = []
     _LIBS = []
-    _LINKFLAGS = ['-Wl,--gc-sections']
+    _LINKFLAGS = []
 
     def __init__( self ):
         VEnvironment.__init__( self )
