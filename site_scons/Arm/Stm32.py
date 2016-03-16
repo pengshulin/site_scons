@@ -8,6 +8,8 @@ class Driver():
     SOURCE = []
     GLOBSOURCE = []
     CFLAG = []
+    LIBPATH = []
+    LIB = []
     LDFLAG = []
 
 # Startup driver
@@ -78,6 +80,14 @@ class STM32303C_EVAL_Driver(STM32_EVAL_Driver):
 class STM32373C_EVAL_Driver(STM32_EVAL_Driver):
     NAME = 'STM32373C_EVAL'
 
+# STemWin
+# NOTE: symbolic link libSTemWin.a needs to be created manually
+class STemWin(Driver):
+    PATH = ['/ST/STemWin/inc']
+    LIBPATH = ['/ST/STemWin/Lib']
+    LIB = ['STemWin.a']
+
+
 
 
     
@@ -94,6 +104,8 @@ class Stm32(CortexM3):
     def appendDriver(self, d):
         if d.USE:
             self.appendPath( d.PATH )
+            self.appendLibPath( d.LIBPATH )
+            self.appendLib( d.LIB )
             self.appendSource( d.SOURCE )
             self.appendGlobSource( d.GLOBSOURCE )
             self.appendCompilerFlag( d.CFLAG )
