@@ -33,6 +33,15 @@ class STM32L1XX_StartupDriver(Driver):
         self.CFLAG = ['-DSTM32L1XX_%s'% density.upper()]
         self.LDFLAG = ['--entry', 'Reset_Handler'] 
 
+class STM32F2XX_StartupDriver(Driver):
+    PATH = ['/CMSIS/Device/ST/STM32F2xx/Include']
+    def __init__(self):
+        self.SOURCE = [
+            '/CMSIS/Device/ST/STM32F2xx/Source/Templates/gcc_ride7/startup_stm32f2xx.s', 
+            '/CMSIS/Device/ST/STM32F2xx/Source/Templates/system_stm32f2xx.c' ]
+        self.CFLAG = []
+        self.LDFLAG = ['--entry', 'Reset_Handler'] 
+
 # Standard Peripheral driver
 class STM32F10X_StdPeripheralDriver(Driver):
     PATH = ['/ST/STM32F10x_StdPeriph_Driver/inc']
@@ -42,6 +51,11 @@ class STM32F10X_StdPeripheralDriver(Driver):
 class STM32L1XX_StdPeripheralDriver(Driver):
     PATH = ['/ST/STM32L1xx_StdPeriph_Driver/inc']
     GLOBSOURCE = ['/ST/STM32L1xx_StdPeriph_Driver/src/*.c']
+    CFLAG = ['-DUSE_STDPERIPH_DRIVER']
+
+class STM32F2XX_StdPeripheralDriver(Driver):
+    PATH = ['/ST/STM32F2xx_StdPeriph_Driver/inc']
+    GLOBSOURCE = ['/ST/STM32F2xx_StdPeriph_Driver/src/*.c']
     CFLAG = ['-DUSE_STDPERIPH_DRIVER']
 
 # USB Full Speed driver
@@ -152,5 +166,12 @@ class Stm32l1mdp(Stm32l1):
 
 class Stm32l1hd(Stm32l1):
     density = 'hd'
+
+# STM32F2xx
+class Stm32f2(Stm32):
+    def __init__(self):
+         Stm32.__init__( self, drivers=[
+            STM32F2XX_StartupDriver(),
+            STM32F2XX_StdPeripheralDriver() ] )
 
 
