@@ -25,3 +25,9 @@ class Msp430(VEnvironment):
 class Msp430F47163(Msp430):
     mcu = 'msp430f47163'
 
+class Msp430FG4616(Msp430):
+    mcu = 'msp430fg4616'
+
+
+
+

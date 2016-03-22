@@ -106,10 +106,27 @@ class VEnvironment(Environment):
         assert isinstance(source, list) 
         self.source += self.applyRoot(source)
 
+    def _glob( self, pat, exclude_pat=None ):
+        assert isinstance(pat, str) 
+        result = self.Glob( join(self.root, pat[1:]) )
+        #print [str(f) for f in result]
+        if exclude_pat:
+            ret = []
+            for fil in result:
+                if not fnmatch( str(fil), exclude_pat ):
+                    ret.append( fil )
+            return ret
+        else:
+            return result
+
     def appendGlobSource( self, pat, expat=None ):
         assert isinstance(pat, list) 
+        p = self.applyRoot(pat)
+        if expat is not None:
+            assert isinstance(expat, str) 
+            expat = self.applyRoot([expat])[0]
         for p in pat:
-            self.appendSource( self.glob(p, expat) )
+            self.appendSource( self._glob(p, expat) )
 
     def findRoot( self ):
         _dir = abspath(getcwd())
@@ -129,23 +146,6 @@ class VEnvironment(Environment):
             return dirname[3:]
         else:
             return dirname
-
-    def glob( self, pat, exclude_pat=None ):
-        assert isinstance(pat, str) 
-        if exclude_pat is not None:
-            assert isinstance(exclude_pat, str) 
-        if pat.startswith('/') and not pat.startswith(self.root):
-            result = self.Glob( join(self.root, pat[1:]) )
-        else:
-            result = self.Glob( pat )
-        if exclude_pat:
-            ret = []
-            for fil in result:
-                if not fnmatch( str(fil), exclude_pat ):
-                    ret.append( fil )
-            return ret
-        else:
-            return result
 
     def setLinkfile( self, linkfile ):
         '''set link file'''
