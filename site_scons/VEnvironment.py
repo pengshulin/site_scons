@@ -108,7 +108,11 @@ class VEnvironment(Environment):
 
     def _glob( self, pat, exclude_pat=None ):
         assert isinstance(pat, str) 
-        result = self.Glob( join(self.root, pat[1:]) )
+        if pat.startswith('/') and not pat.startswith(self.root):
+            result = self.Glob( join(self.root, pat[1:]) )
+        else:
+            result = self.Glob( pat )
+        #print 'Glob:', pat
         #print [str(f) for f in result]
         if exclude_pat:
             ret = []
