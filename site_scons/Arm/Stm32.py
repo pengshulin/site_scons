@@ -197,6 +197,10 @@ class Stm32l1mdp(Stm32l1):
 class Stm32l1hd(Stm32l1):
     density = 'hd'
 
+class Stm32l1xl(Stm32l1):
+    density = 'xl'
+
+
 # STM32F2xx
 class Stm32f2(Stm32M3):
     def __init__(self):
