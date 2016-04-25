@@ -5,9 +5,15 @@ from SCons.Errors import StopError
 
 from Toolchain import Gcc
 
-from os import environ, getcwd
+from os import environ, getenv, getcwd
 from os.path import basename, abspath, isfile, join
 from fnmatch import fnmatch 
+
+
+_SWITCH_CONFIRM = ['1', 'Y', 'y', 'T', 't']
+
+def _getBoolEnv( name ):
+    return bool( getenv(name) in _SWITCH_CONFIRM )
 
 
 class VEnvironment(Environment):
@@ -32,8 +38,15 @@ class VEnvironment(Environment):
     _LINKFLAGS = []
 
 
+    def _initFromSysEnv( self ):
+        self.VERBOSE = _getBoolEnv( 'VERBOSE' )
+        self.INFO = _getBoolEnv( 'INFO' )
+        self.DEBUG = _getBoolEnv( 'DEBUG' )
+
     def __init__( self ):
         Environment.__init__( self, ENV=environ )
+
+        self._initFromSysEnv()
 
         tool = self._TOOLCHAIN()
         self['AR'] = tool.AR
