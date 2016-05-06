@@ -158,11 +158,12 @@ class VEnvironment(Environment):
     def getName( self ):
         dirname = basename(getcwd())
         if dirname.startswith('app'):
-            return dirname[3:]
+            name = dirname[3:]
         elif dirname.startswith('lib'):
-            return dirname[3:]
+            name = dirname[3:]
         else:
-            return dirname
+            name = dirname
+        return name + '_dbg' if self.DEBUG else name
 
     def setLinkfile( self, linkfile ):
         '''set link file'''
