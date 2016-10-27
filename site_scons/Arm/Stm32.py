@@ -1,5 +1,5 @@
 '''stm32 series'''
-from Cortex import CortexM0, CortexM3, CortexM4
+from Cortex import CortexM0, CortexM3, CortexM4, CortexM7
 
 
 class Driver():
@@ -42,14 +42,24 @@ class STM32F2XX_StartupDriver(Driver):
         self.CFLAG = []
         self.LDFLAG = ['--entry', 'Reset_Handler'] 
 
+
+
 class STM32F4XX_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32F4xx/Include']
+    EX_DEF = {
+        'STM32F407xx': 'STM32F40_41xxx',
+        'STM32F429xx': 'STM32F429_439xx',
+        # TODO: append new chips when needed
+        }
+
     def __init__(self, cpu):
         self.SOURCE = [
             '/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_%s.s'% cpu.lower(), 
             '/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c' ]
         self.CFLAG = []
         self.CFLAG.append( '-D%s'% cpu )
+        if cpu in self.EX_DEF.keys():
+            self.CFLAG.append( '-D%s'% self.EX_DEF[cpu] )
         self.LDFLAG = ['--entry', 'Reset_Handler'] 
 
 
@@ -69,10 +79,10 @@ class STM32F2XX_StdPeripheralDriver(Driver):
     GLOBSOURCE = ['/ST/STM32F2xx_StdPeriph_Driver/src/*.c']
     CFLAG = ['-DUSE_STDPERIPH_DRIVER']
 
-#class STM32F4XX_StdPeripheralDriver(Driver):
-#    PATH = ['/ST/STM32F2xx_StdPeriph_Driver/inc']
-#    GLOBSOURCE = ['/ST/STM32F2xx_StdPeriph_Driver/src/*.c']
-#    CFLAG = ['-DUSE_STDPERIPH_DRIVER']
+class STM32F4XX_StdPeripheralDriver(Driver):
+    PATH = ['/ST/STM32F4xx_StdPeriph_Driver/inc']
+    GLOBSOURCE = ['/ST/STM32F4xx_StdPeriph_Driver/src/*.c']
+    CFLAG = ['-DUSE_STDPERIPH_DRIVER']
 
 
 # USB Full Speed driver
@@ -155,6 +165,12 @@ class Stm32M4(CortexM4, _base_class):
         CortexM4.__init__( self )
         _base_class.__init__(self, drivers)
 
+class Stm32M7(CortexM7, _base_class):
+    def __init__( self, drivers=None ):
+        CortexM7.__init__( self )
+        _base_class.__init__(self, drivers)
+
+
 
 # STM32F10x
 class Stm32f1(Stm32M3):
@@ -208,12 +224,17 @@ class Stm32f2(Stm32M3):
             STM32F2XX_StartupDriver(),
             STM32F2XX_StdPeripheralDriver() ] )
 
+
 # STM32F4xx
 class Stm32f4(Stm32M4):
     def __init__(self):
         Stm32M4.__init__( self, drivers=[
             STM32F4XX_StartupDriver(self.cpu),
-            ])#STM32F4XX_StdPeripheralDriver() ] )
+            STM32F4XX_StdPeripheralDriver() ] )
+
+
+class Stm32f407xx(Stm32f4):
+    cpu = 'STM32F407xx'
 
 
 class Stm32f429xx(Stm32f4):

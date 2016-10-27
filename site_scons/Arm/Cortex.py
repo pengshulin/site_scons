@@ -32,5 +32,8 @@ class CortexM3(Cortex):
 class CortexM4(Cortex):
     _MCPU = 'cortex-m4'
 
+class CortexM7(Cortex):
+    _MCPU = 'cortex-m7'
+
 
 
