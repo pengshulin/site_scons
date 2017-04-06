@@ -31,9 +31,13 @@ class CortexM3(Cortex):
 
 class CortexM4(Cortex):
     _MCPU = 'cortex-m4'
+    def __init__( self ):
+        Cortex.__init__(self)
+        self.appendCompilerFlag(['-mfpu=fpv4-sp-d16', '-mfloat-abi=softfp'])
+
 
 class CortexM7(Cortex):
     _MCPU = 'cortex-m7'
-
+ 
 
 

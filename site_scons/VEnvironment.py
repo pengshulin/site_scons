@@ -6,7 +6,7 @@ from SCons.Errors import StopError
 from Toolchain import Gcc
 
 from os import environ, getenv, getcwd
-from os.path import basename, abspath, isfile, join
+from os.path import basename, abspath, isfile, join, splitext
 from fnmatch import fnmatch 
 
 
@@ -192,4 +192,16 @@ class VEnvironment(Environment):
             name = self.getName()
         libfile = self.Library( name, self.source )
         self.Size( source=libfile )
+
+
+    def makeMDPDF( self, fname ):
+        try:
+            self.builder_pdf
+        except AttributeError:
+            self.builder_pdf = Builder(action='markdown2pdf $SOURCES $TARGET',
+                       suffix='.pdf', src_suffix='.md' )
+            self.Append(BUILDERS = {'MDPDF': self.builder_pdf})
+        base = splitext(fname)[0]
+        self.MDPDF( target='%s.pdf'% base, source='%s.md'% base )
+
 
