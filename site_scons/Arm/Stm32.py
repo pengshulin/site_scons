@@ -13,6 +13,28 @@ class Driver():
     LDFLAG = []
 
 # Startup driver
+class STM32F0XX_StartupDriver(Driver):
+    PATH = ['/CMSIS/Device/ST/STM32F0xx/Include']
+    EX_DEF = {
+        'STM32F030': 'STM32F030',
+        'STM32F031': 'STM32F031',
+        'STM32F042': 'STM32F042',
+        'STM32F051': 'STM32F051',
+        'STM32F072': 'STM32F072',
+        }
+
+    def __init__(self, cpu):
+        self.SOURCE = [
+            '/CMSIS/Device/ST/STM32F0xx/Source/Templates/gcc_ride7/startup_%s.s'% cpu.lower(), 
+            '/CMSIS/Device/ST/STM32F0xx/Source/Templates/system_stm32f0xx.c' ]
+        self.CFLAG = []
+        self.CFLAG.append( '-D%s'% cpu )
+        if cpu in self.EX_DEF.keys():
+            self.CFLAG.append( '-D%s'% self.EX_DEF[cpu] )
+        self.LDFLAG = ['--entry', 'Reset_Handler'] 
+
+
+
 class STM32F10X_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32F10x/Include']
     def __init__(self, density):
@@ -63,7 +85,30 @@ class STM32F4XX_StartupDriver(Driver):
         self.LDFLAG = ['--entry', 'Reset_Handler'] 
 
 
+class STM32F7XX_StartupDriver(Driver):
+    PATH = ['/CMSIS/Device/ST/STM32F7xx/Include']
+    EX_DEF = {
+        # TODO: append new chips when needed
+        }
+
+    def __init__(self, cpu):
+        self.SOURCE = [
+            '/CMSIS/Device/ST/STM32F7xx/Source/Templates/gcc/startup_%s.s'% cpu.lower(), 
+            '/CMSIS/Device/ST/STM32F7xx/Source/Templates/system_stm32f7xx.c' ]
+        self.CFLAG = []
+        self.CFLAG.append( '-D%s'% cpu )
+        if cpu in self.EX_DEF.keys():
+            self.CFLAG.append( '-D%s'% self.EX_DEF[cpu] )
+        self.LDFLAG = ['--entry', 'Reset_Handler'] 
+
+
+
 # Standard Peripheral driver
+class STM32F0XX_StdPeripheralDriver(Driver):
+    PATH = ['/ST/STM32F0xx_StdPeriph_Driver/inc']
+    GLOBSOURCE = ['/ST/STM32F0xx_StdPeriph_Driver/src/*.c']
+    CFLAG = ['-DUSE_STDPERIPH_DRIVER']
+
 class STM32F10X_StdPeripheralDriver(Driver):
     PATH = ['/ST/STM32F10x_StdPeriph_Driver/inc']
     GLOBSOURCE = ['/ST/STM32F10x_StdPeriph_Driver/src/*.c']
@@ -83,6 +128,12 @@ class STM32F4XX_StdPeripheralDriver(Driver):
     PATH = ['/ST/STM32F4xx_StdPeriph_Driver/inc']
     GLOBSOURCE = ['/ST/STM32F4xx_StdPeriph_Driver/src/*.c']
     CFLAG = ['-DUSE_STDPERIPH_DRIVER']
+
+class STM32F7XX_StdPeripheralDriver(Driver):
+    PATH = ['/ST/STM32F7xx_HAL_Driver/Inc']
+    GLOBSOURCE = ['/ST/STM32F7xx_HAL_Driver/Src/*.c']
+    #CFLAG = ['-DUSE_STDPERIPH_DRIVER']
+
 
 
 # USB Full Speed driver
@@ -153,23 +204,43 @@ class _base_class():
 class Stm32M0(CortexM0, _base_class):
     def __init__( self, drivers=None ):
         CortexM0.__init__( self )
+        self.appendCompilerFlag( ['-DCORTEX_M0'] )
         _base_class.__init__(self, drivers)
 
 class Stm32M3(CortexM3, _base_class):
     def __init__( self, drivers=None ):
         CortexM3.__init__( self )
+        self.appendCompilerFlag( ['-DCORTEX_M3'] )
+        _base_class.__init__(self, drivers)
         _base_class.__init__(self, drivers)
 
 class Stm32M4(CortexM4, _base_class):
     def __init__( self, drivers=None ):
         CortexM4.__init__( self )
+        self.appendCompilerFlag( ['-DCORTEX_M4'] )
         _base_class.__init__(self, drivers)
 
 class Stm32M7(CortexM7, _base_class):
     def __init__( self, drivers=None ):
         CortexM7.__init__( self )
+        self.appendCompilerFlag( ['-DCORTEX_M7'] )
         _base_class.__init__(self, drivers)
 
+
+
+# STM32F0xx
+class Stm32f0(Stm32M0):
+    def __init__(self):
+        Stm32M0.__init__( self, drivers=[
+            STM32F0XX_StartupDriver(self.cpu),
+            STM32F0XX_StdPeripheralDriver() ] )
+
+
+class Stm32f030xx(Stm32f0):
+    cpu = 'STM32F030'
+
+class Stm32f042xx(Stm32f0):
+    cpu = 'STM32F042'
 
 
 # STM32F10x
@@ -240,5 +311,15 @@ class Stm32f407xx(Stm32f4):
 class Stm32f429xx(Stm32f4):
     cpu = 'STM32F429xx'
 
+
+# STM32F7xx
+class Stm32f7(Stm32M7):
+    def __init__(self):
+        Stm32M7.__init__( self, drivers=[
+            STM32F7XX_StartupDriver(self.cpu),
+            STM32F7XX_StdPeripheralDriver() ] )
+
+class Stm32f767xx(Stm32f7):
+    cpu = 'STM32F767xx'
 
 
