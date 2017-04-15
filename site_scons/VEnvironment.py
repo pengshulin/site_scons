@@ -117,7 +117,9 @@ class VEnvironment(Environment):
 
     def appendSource( self, source ):
         assert isinstance(source, list) 
-        self.source += self.applyRoot(source)
+        for f in self.applyRoot(source):
+            if not f in self.source:
+                self.source.append(f)
 
     def _glob( self, pat, exclude_pat=None ):
         assert isinstance(pat, str) 
