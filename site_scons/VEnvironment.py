@@ -6,7 +6,7 @@ from SCons.Errors import StopError
 from Toolchain import Gcc
 
 from os import environ, getenv, getcwd
-from os.path import basename, abspath, isfile, join, splitext
+from os.path import basename, abspath, isfile, join, splitext, dirname
 from fnmatch import fnmatch 
 
 
@@ -178,6 +178,8 @@ class VEnvironment(Environment):
         '''make application'''
         if self.linkfile:
             self.appendLinkFlag( ['-T%s'% self.linkfile] )
+            self.appendLinkFlag( ['-L%s'% dirname(self.linkfile)] )
+            
         if not name:
             name = self.getName()
         self.appendLinkFlag( ['-Wl,-Map,%s.map'% name] )
