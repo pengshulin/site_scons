@@ -1,16 +1,8 @@
 '''stm32 series'''
 from Cortex import CortexM0, CortexM3, CortexM4, CortexM7
+from Cortex import CMSIS_DSP_Driver
+from VEnvironment import Driver
 
-
-class Driver():
-    USE = True
-    PATH = []
-    SOURCE = []
-    GLOBSOURCE = []
-    CFLAG = []
-    LIBPATH = []
-    LIB = []
-    LDFLAG = []
 
 # Startup driver
 class STM32F0XX_StartupDriver(Driver):
@@ -177,7 +169,7 @@ class STM32373C_EVAL_Driver(STM32_EVAL_Driver):
 class STemWin(Driver):
     PATH = ['/ST/STemWin/inc']
     LIBPATH = ['/ST/STemWin/Lib']
-    LIB = ['STemWin.a']
+    LIB = ['STemWin']
 
 
 
@@ -192,14 +184,13 @@ class _base_class():
             self.appendDriver(d)
 
     def appendDriver(self, d):
-        if d.USE:
-            self.appendPath( d.PATH )
-            self.appendLibPath( d.LIBPATH )
-            self.appendLib( d.LIB )
-            self.appendSource( d.SOURCE )
-            self.appendGlobSource( d.GLOBSOURCE )
-            self.appendCompilerFlag( d.CFLAG )
-            self.appendLinkFlag( d.CFLAG )
+        self.appendPath( d.PATH )
+        self.appendLibPath( d.LIBPATH )
+        self.appendLib( d.LIB )
+        self.appendSource( d.SOURCE )
+        self.appendGlobSource( d.GLOBSOURCE )
+        self.appendCompilerFlag( d.CFLAG )
+        self.appendLinkFlag( d.LDFLAG )
 
 class Stm32M0(CortexM0, _base_class):
     def __init__( self, drivers=None ):

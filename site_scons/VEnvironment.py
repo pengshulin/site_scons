@@ -15,6 +15,14 @@ _SWITCH_CONFIRM = ['1', 'Y', 'y', 'T', 't']
 def _getBoolEnv( name ):
     return bool( getenv(name) in _SWITCH_CONFIRM )
 
+class Driver():
+    PATH = []
+    SOURCE = []
+    GLOBSOURCE = []
+    CFLAG = []
+    LIBPATH = []
+    LIB = []
+    LDFLAG = []
 
 class VEnvironment(Environment):
     source = []
@@ -80,7 +88,7 @@ class VEnvironment(Environment):
         SIZE_BUILDER = Builder( action = tool.SIZE + ' -t $SOURCE', src_suffix='.elf' )
         self.Append( BUILDERS={'Size': SIZE_BUILDER} )
 
-        DUMP_BUILDER = Builder( action = tool.OBJDUMP + ' -x -S -D -s $SOURCE $TARGET', suffix='.S', src_suffix='.o' )
+        DUMP_BUILDER = Builder( action = tool.OBJDUMP + ' -adhlS $SOURCE > $TARGET', suffix='.lst', src_suffix='.elf' )
         self.Append( BUILDERS={'Dump': DUMP_BUILDER} )
 
         self.findRoot()
@@ -186,8 +194,10 @@ class VEnvironment(Environment):
         elffile = self.Program( name + '.elf', self.source )
         binfile = self.Bin( name + '.bin', elffile )
         hexfile = self.Hex( name + '.hex', elffile )
+        lstfile = self.Dump( name + '.lst', elffile )
         self.Depends( binfile, elffile )
         self.Depends( hexfile, elffile )
+        self.Depends( lstfile, elffile )
         self.Size( source=elffile )
         # TODO: add obj dumper if needed
 
