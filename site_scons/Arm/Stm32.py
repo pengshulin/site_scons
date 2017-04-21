@@ -23,8 +23,7 @@ class STM32F0XX_StartupDriver(Driver):
         self.CFLAG.append( '-D%s'% cpu )
         if cpu in self.EX_DEF.keys():
             self.CFLAG.append( '-D%s'% self.EX_DEF[cpu] )
-        self.LDFLAG = ['--entry', 'Reset_Handler'] 
-
+        self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
 
 class STM32F10X_StartupDriver(Driver):
@@ -35,7 +34,8 @@ class STM32F10X_StartupDriver(Driver):
             '/CMSIS/Device/ST/STM32F10x/Source/Templates/gcc_ride7/startup_stm32f10x_%s.s'% density, 
             '/CMSIS/Device/ST/STM32F10x/Source/Templates/system_stm32f10x.c' ]
         self.CFLAG = ['-DSTM32F10X_%s'% density.upper()]
-        self.LDFLAG = ['--entry', 'Reset_Handler'] 
+        self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
+
 
 class STM32L1XX_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32L1xx/Include']
@@ -45,7 +45,7 @@ class STM32L1XX_StartupDriver(Driver):
             '/CMSIS/Device/ST/STM32L1xx/Source/Templates/gcc_ride7/startup_stm32l1xx_%s.s'% density, 
             '/CMSIS/Device/ST/STM32L1xx/Source/Templates/system_stm32l1xx.c' ]
         self.CFLAG = ['-DSTM32L1XX_%s'% density.upper()]
-        self.LDFLAG = ['--entry', 'Reset_Handler'] 
+        self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
 class STM32F2XX_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32F2xx/Include']
@@ -54,7 +54,7 @@ class STM32F2XX_StartupDriver(Driver):
             '/CMSIS/Device/ST/STM32F2xx/Source/Templates/gcc_ride7/startup_stm32f2xx.s', 
             '/CMSIS/Device/ST/STM32F2xx/Source/Templates/system_stm32f2xx.c' ]
         self.CFLAG = []
-        self.LDFLAG = ['--entry', 'Reset_Handler'] 
+        self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
 
 
@@ -74,7 +74,7 @@ class STM32F4XX_StartupDriver(Driver):
         self.CFLAG.append( '-D%s'% cpu )
         if cpu in self.EX_DEF.keys():
             self.CFLAG.append( '-D%s'% self.EX_DEF[cpu] )
-        self.LDFLAG = ['--entry', 'Reset_Handler'] 
+        self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
 
 class STM32F7XX_StartupDriver(Driver):
@@ -91,7 +91,7 @@ class STM32F7XX_StartupDriver(Driver):
         self.CFLAG.append( '-D%s'% cpu )
         if cpu in self.EX_DEF.keys():
             self.CFLAG.append( '-D%s'% self.EX_DEF[cpu] )
-        self.LDFLAG = ['--entry', 'Reset_Handler'] 
+        self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
 
 

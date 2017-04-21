@@ -185,12 +185,12 @@ class VEnvironment(Environment):
     def makeApp( self, name=None ):
         '''make application'''
         if self.linkfile:
-            self.appendLinkFlag( ['-T%s'% self.linkfile] )
-            self.appendLinkFlag( ['-L%s'% dirname(self.linkfile)] )
+            self.appendLinkFlag( ['-Wl,-L%s'% dirname(self.linkfile)] )
+            self.appendLinkFlag( ['-Wl,-T%s'% self.linkfile] )
             
         if not name:
             name = self.getName()
-        self.appendLinkFlag( ['-Wl,-Map,%s.map'% name] )
+        self.appendLinkFlag( ['-Wl,--Map=%s.map'% name] )
         elffile = self.Program( name + '.elf', self.source )
         binfile = self.Bin( name + '.bin', elffile )
         hexfile = self.Hex( name + '.hex', elffile )

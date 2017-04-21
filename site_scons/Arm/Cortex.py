@@ -22,11 +22,16 @@ class Cortex(VEnvironment):
     def __init__( self ):
         VEnvironment.__init__( self )
         assert self._MCPU
+        # NOTE: 
+        # link flags must contain cpu/fpu configs same as compiler flags,
+        # which will influence how the ld is called and which libs are used
         self.appendCompilerFlag( ['-mcpu=%s'%self._MCPU, '-mthumb'] )
         self.appendLinkFlag( ['-mcpu=%s'%self._MCPU, '-mthumb'] )
         self.appendPath( ['/CMSIS/Include'] )
         self.appendCompilerFlag(self._EXTRA_CCFLAGS)
         self.appendLinkFlag(self._EXTRA_LINKFLAGS)
+        #self.appendLinkFlag(['-v'])  # to check how ld is called by gcc
+        #self.appendCompilerFlag( ['-print-libgcc-file-name'] )
 
 
 
@@ -44,13 +49,17 @@ class CortexM3(Cortex):
 
 class CortexM4(Cortex):
     _MCPU = 'cortex-m4'
-    _EXTRA_CCFLAGS = ['-mfloat-abi=softfp', '-fsingle-precision-constant', '-mfpu=fpv4-sp-d16', ]
-    #_EXTRA_CCFLAGS = ['-mfloat-abi=hard', '-fsingle-precision-constant', '-mfpu=fpv4-sp-d16', ]
-    #_EXTRA_LINKFLAGS = ['-mfloat-abi=softfp']
+    #_EXTRA_CCFLAGS = ['-mfloat-abi=softfp', '-fsingle-precision-constant', '-mfpu=fpv4-sp-d16', ]
+    #_EXTRA_LINKFLAGS = ['-mfloat-abi=softfp', '-fsingle-precision-constant', '-mfpu=fpv4-sp-d16', ]
+    _EXTRA_CCFLAGS = ['-mfloat-abi=hard', '-fsingle-precision-constant', '-mfpu=fpv4-sp-d16', ]
+    _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-fsingle-precision-constant', '-mfpu=fpv4-sp-d16', ]
 
 class CortexM7(Cortex):
     _MCPU = 'cortex-m7'
-    _EXTRA_CCFLAGS = ['-mfloat-abi=softfp', '-mfpu=fpv4-sp-d16']
+    #_EXTRA_CCFLAGS = ['-mfloat-abi=softfp', '-mfpu=fpv4-sp-d16']
+    #_EXTRA_LINKFLAGS = ['-mfloat-abi=softfp', '-mfpu=fpv4-sp-d16']
+    _EXTRA_CCFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
+    _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
 
 
 # CMSIS-DSP driver
