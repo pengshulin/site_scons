@@ -203,7 +203,6 @@ class Stm32M3(CortexM3, _base_class):
         CortexM3.__init__( self )
         self.appendCompilerFlag( ['-DCORTEX_M3'] )
         _base_class.__init__(self, drivers)
-        _base_class.__init__(self, drivers)
 
 class Stm32M4(CortexM4, _base_class):
     def __init__( self, drivers=None ):

@@ -184,6 +184,10 @@ class VEnvironment(Environment):
          
     def makeApp( self, name=None ):
         '''make application'''
+        try:
+            self._optimize_flags_added
+        except AttributeError:
+            self.appendOptimizeFlags()
         if self.linkfile:
             self.appendLinkFlag( ['-Wl,-L%s'% dirname(self.linkfile)] )
             self.appendLinkFlag( ['-Wl,-T%s'% self.linkfile] )
@@ -207,7 +211,6 @@ class VEnvironment(Environment):
         libfile = self.Library( name, self.source )
         self.Size( source=libfile )
 
-
     def makeMDPDF( self, fname ):
         try:
             self.builder_pdf
@@ -217,5 +220,25 @@ class VEnvironment(Environment):
             self.Append(BUILDERS = {'MDPDF': self.builder_pdf})
         base = splitext(fname)[0]
         self.MDPDF( target='%s.pdf'% base, source='%s.md'% base )
+
+    def appendOptimizeFlags( self, optimize_flags=None, define_flags=None ):
+        if optimize_flags is None:
+            if self.DEBUG:
+                optimize_flags = ['-g', '-O0']
+            else:
+                optimize_flags = ['-O3', '-Werror']
+        self.appendCompilerFlag(optimize_flags)
+        self._optimize_flags_added = True
+        if define_flags is None:
+            if self.DEBUG:
+                define_flagss = ['-DEBUG']
+            else:
+                define_flagss = ['-NDEBUG']
+        self.appendDefineFlags(define_flags)
+
+    def appendDefineFlags( self, define_flags=None ):
+        if define_flags is None:
+            return
+        self.appendCompilerFlag(['-D%s'% d for d in define_flags])
 
 
