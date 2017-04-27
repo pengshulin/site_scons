@@ -32,7 +32,7 @@ class Cortex(VEnvironment):
         self.appendLinkFlag(self._EXTRA_LINKFLAGS)
         #self.appendLinkFlag(['-v'])  # to check how ld is called by gcc
         #self.appendCompilerFlag( ['-print-libgcc-file-name'] )
-
+        #self.appendCompilerFlag(['-fsingle-precision-constant'])
 
 
 class CortexM0(Cortex):
@@ -49,15 +49,11 @@ class CortexM3(Cortex):
 
 class CortexM4(Cortex):
     _MCPU = 'cortex-m4'
-    #_EXTRA_CCFLAGS = ['-mfloat-abi=softfp', '-fsingle-precision-constant', '-mfpu=fpv4-sp-d16', ]
-    #_EXTRA_LINKFLAGS = ['-mfloat-abi=softfp', '-fsingle-precision-constant', '-mfpu=fpv4-sp-d16', ]
-    _EXTRA_CCFLAGS = ['-mfloat-abi=hard', '-fsingle-precision-constant', '-mfpu=fpv4-sp-d16', ]
-    _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-fsingle-precision-constant', '-mfpu=fpv4-sp-d16', ]
+    _EXTRA_CCFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16', ]
+    _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16', ]
 
 class CortexM7(Cortex):
     _MCPU = 'cortex-m7'
-    #_EXTRA_CCFLAGS = ['-mfloat-abi=softfp', '-mfpu=fpv4-sp-d16']
-    #_EXTRA_LINKFLAGS = ['-mfloat-abi=softfp', '-mfpu=fpv4-sp-d16']
     _EXTRA_CCFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
     _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
 

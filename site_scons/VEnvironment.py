@@ -8,6 +8,7 @@ from Toolchain import Gcc
 from os import environ, getenv, getcwd
 from os.path import basename, abspath, isfile, join, splitext, dirname
 from fnmatch import fnmatch 
+from time import strftime
 
 
 _SWITCH_CONFIRM = ['1', 'Y', 'y', 'T', 't']
@@ -50,11 +51,15 @@ class VEnvironment(Environment):
         self.VERBOSE = _getBoolEnv( 'VERBOSE' )
         self.INFO = _getBoolEnv( 'INFO' )
         self.DEBUG = _getBoolEnv( 'DEBUG' )
+    
+    def _initBuildDate( self ):
+        self.BUILD_DATE = strftime("%y-%m-%d %H:%M:%S")
 
     def __init__( self ):
         Environment.__init__( self, ENV=environ )
 
         self._initFromSysEnv()
+        self._initBuildDate()
 
         tool = self._TOOLCHAIN()
         self['AR'] = tool.AR
@@ -92,6 +97,19 @@ class VEnvironment(Environment):
         self.Append( BUILDERS={'Dump': DUMP_BUILDER} )
 
         self.findRoot()
+        self.setMultiJobs()
+
+    def setMultiJobs(self):
+        cpus = 0
+        try:
+            for l in open('/proc/cpuinfo','r').readlines():
+                if l.startswith('processor'):
+                    cpus += 1
+        except:
+            pass
+        if cpus > 1:
+            #print 'cpus', cpus
+            self.SetOption('num_jobs', cpus)
 
     def appendCompilerFlag( self, flag ):
         assert isinstance(flag, list) 
@@ -191,6 +209,8 @@ class VEnvironment(Environment):
         if self.linkfile:
             self.appendLinkFlag( ['-Wl,-L%s'% dirname(self.linkfile)] )
             self.appendLinkFlag( ['-Wl,-T%s'% self.linkfile] )
+            
+        #self.appendCompilerFlag( ['-DBUILD_DATE=%s'% self.BUILD_DATE] )
             
         if not name:
             name = self.getName()
