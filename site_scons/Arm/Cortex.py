@@ -1,4 +1,5 @@
 '''cortex based controller'''
+# mcu build scripts based on scons, designed by PengShulin 
 from Toolchain import Gcc
 from VEnvironment import VEnvironment, Driver
 
@@ -19,7 +20,7 @@ class Cortex(VEnvironment):
     _EXTRA_CCFLAGS = []
     _EXTRA_LINKFLAGS = []
 
-    def __init__( self ):
+    def __init__( self, cmsis_inc=True ):
         VEnvironment.__init__( self )
         assert self._MCPU
         # NOTE: 
@@ -27,7 +28,8 @@ class Cortex(VEnvironment):
         # which will influence how the ld is called and which libs are used
         self.appendCompilerFlag( ['-mcpu=%s'%self._MCPU, '-mthumb'] )
         self.appendLinkFlag( ['-mcpu=%s'%self._MCPU, '-mthumb'] )
-        self.appendPath( ['/CMSIS/Include'] )
+        if cmsis_inc:
+            self.appendPath( ['/CMSIS/Include'] )
         self.appendCompilerFlag(self._EXTRA_CCFLAGS)
         self.appendLinkFlag(self._EXTRA_LINKFLAGS)
         #self.appendLinkFlag(['-v'])  # to check how ld is called by gcc

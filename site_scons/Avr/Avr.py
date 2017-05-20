@@ -1,4 +1,5 @@
 '''Avr controller'''
+# mcu build scripts based on scons, designed by PengShulin 
 from Toolchain import Gcc
 from VEnvironment import VEnvironment
 

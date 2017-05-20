@@ -1,4 +1,5 @@
 '''toolchain defination'''
+# mcu build scripts based on scons, designed by PengShulin 
 
 class Gcc():
     '''base toochain'''

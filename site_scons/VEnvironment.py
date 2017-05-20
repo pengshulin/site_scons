@@ -1,4 +1,5 @@
 '''Virtual Environment'''
+# mcu build scripts based on scons, designed by PengShulin 
 from SCons.Builder import Builder
 from SCons.Environment import Environment
 from SCons.Errors import StopError
@@ -51,6 +52,12 @@ class VEnvironment(Environment):
         self.VERBOSE = _getBoolEnv( 'VERBOSE' )
         self.INFO = _getBoolEnv( 'INFO' )
         self.DEBUG = _getBoolEnv( 'DEBUG' )
+
+    def getEnv( self, name ):
+        return getenv(name, '')
+
+    def getBoolEnv( self, name ):
+        return _getBoolEnv( name )
     
     def _initBuildDate( self ):
         self.BUILD_DATE = strftime("%y-%m-%d %H:%M:%S")
@@ -207,7 +214,10 @@ class VEnvironment(Environment):
         except AttributeError:
             self.appendOptimizeFlags()
         if self.linkfile:
-            self.appendLinkFlag( ['-Wl,-L%s'% dirname(self.linkfile)] )
+            linkfile_dir = dirname(self.linkfile)
+            if linkfile_dir:
+                # linkfile in different directory, append search path
+                self.appendLinkFlag( ['-Wl,-L%s'% linkfile_dir] )
             self.appendLinkFlag( ['-Wl,-T%s'% self.linkfile] )
             
         #self.appendCompilerFlag( ['-DBUILD_DATE=%s'% self.BUILD_DATE] )
