@@ -261,9 +261,9 @@ class VEnvironment(Environment):
         self._optimize_flags_added = True
         if define_flags is None:
             if self.DEBUG:
-                define_flagss = ['-DEBUG']
+                define_flags = ['DEBUG']
             else:
-                define_flagss = ['-NDEBUG']
+                define_flags = ['NDEBUG']
         self.appendDefineFlags(define_flags)
 
     def appendDefineFlags( self, define_flags=None ):
