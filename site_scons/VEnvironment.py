@@ -121,6 +121,7 @@ class VEnvironment(Environment):
     def appendCompilerFlag( self, flag ):
         assert isinstance(flag, list) 
         self.Append( CCFLAGS=flag )
+    
 
     def appendLinkFlag( self, flag ):
         assert isinstance(flag, list) 
@@ -139,7 +140,7 @@ class VEnvironment(Environment):
     def appendPath( self, path ):
         assert isinstance(path, list) 
         self.Append( CPPPATH=self.applyRoot(path) )
-
+    
     def appendLibPath( self, path ):
         assert isinstance(path, list) 
         self.Append( LIBPATH=self.applyRoot(path) )
@@ -270,5 +271,22 @@ class VEnvironment(Environment):
         if define_flags is None:
             return
         self.appendCompilerFlag(['-D%s'% d for d in define_flags])
+
+    appendPaths = appendPath
+    appendGlobSources = appendGlobSource
+    appendSources = appendSource
+    appendLibPaths = appendLibPath
+    appendLibs = appendLib
+    appendCompileFlag = appendCompilerFlag
+    appendCompileFlags = appendCompilerFlag
+    appendCompilerFlags = appendCompilerFlag
+    appendLinkFlags = appendLinkFlag
+    appendLinkerFlag = appendLinkFlag
+    appendLinkerFlags = appendLinkFlag
+    appendDefineFlag = appendDefineFlags
+    appendDefinedFlag = appendDefineFlags
+    appendDefinedFlags = appendDefineFlags
+
+   
 
 
