@@ -39,24 +39,24 @@ class Cortex(VEnvironment):
 
 class CortexM0(Cortex):
     _MCPU = 'cortex-m0'
-    _EXTRA_CCFLAGS = ['-mfloat-abi=soft']
+    _EXTRA_CCFLAGS = ['-DCORTEX_M0', '-DCORE_M0', '-mfloat-abi=soft']
 
 class CortexM0plus(Cortex):
     _MCPU = 'cortex-m0plus'
-    _EXTRA_CCFLAGS = ['-mfloat-abi=soft']
+    _EXTRA_CCFLAGS = ['-DCORTEX_M0', '-DCORE_M0', '-mfloat-abi=soft']
 
 class CortexM3(Cortex):
     _MCPU = 'cortex-m3'
-    _EXTRA_CCFLAGS = ['-mfloat-abi=soft']
+    _EXTRA_CCFLAGS = ['-DCORTEX_M3', '-DCORE_M3', '-mfloat-abi=soft']
 
 class CortexM4(Cortex):
     _MCPU = 'cortex-m4'
-    _EXTRA_CCFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16', ]
+    _EXTRA_CCFLAGS = ['-DCORTEX_M4', '-DCORE_M4', '-mfloat-abi=hard', '-mfpu=fpv4-sp-d16', ]
     _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16', ]
 
 class CortexM7(Cortex):
     _MCPU = 'cortex-m7'
-    _EXTRA_CCFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
+    _EXTRA_CCFLAGS = ['-DCORTEX_M7', '-DCORE_M7', '-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
     _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
 
 

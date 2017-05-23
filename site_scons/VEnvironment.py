@@ -272,6 +272,23 @@ class VEnvironment(Environment):
             return
         self.appendCompilerFlag(['-D%s'% d for d in define_flags])
 
+    def appendDriver( self, d ):
+        if isinstance(d, Driver):
+            self.appendPath( d.PATH )
+            self.appendLibPath( d.LIBPATH )
+            self.appendLib( d.LIB )
+            self.appendSource( d.SOURCE )
+            self.appendGlobSource( d.GLOBSOURCE )
+            self.appendCompilerFlag( d.CFLAG )
+            self.appendLinkFlag( d.LDFLAG )
+
+    def appendDrivers( self, drivers ):
+        if drivers:
+            for d in drivers: 
+                self.appendDriver(d)
+
+
+
     appendPaths = appendPath
     appendGlobSources = appendGlobSource
     appendSources = appendSource

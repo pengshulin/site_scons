@@ -175,47 +175,26 @@ class STemWin(Driver):
 
 
     
-# base class
-class _base_class():
-    DRIVERS = {}
-    def __init__( self, drivers=None ):
-        if drivers is None:
-            drivers = self.DRIVERS
-        for d in drivers: 
-            self.appendDriver(d)
 
-    def appendDriver(self, d):
-        self.appendPath( d.PATH )
-        self.appendLibPath( d.LIBPATH )
-        self.appendLib( d.LIB )
-        self.appendSource( d.SOURCE )
-        self.appendGlobSource( d.GLOBSOURCE )
-        self.appendCompilerFlag( d.CFLAG )
-        self.appendLinkFlag( d.LDFLAG )
-
-class Stm32M0(CortexM0, _base_class):
+class Stm32M0(CortexM0):
     def __init__( self, drivers=None ):
         CortexM0.__init__( self )
-        self.appendCompilerFlag( ['-DCORTEX_M0'] )
-        _base_class.__init__(self, drivers)
+        self.appendDrivers( drivers )
 
-class Stm32M3(CortexM3, _base_class):
+class Stm32M3(CortexM3):
     def __init__( self, drivers=None ):
         CortexM3.__init__( self )
-        self.appendCompilerFlag( ['-DCORTEX_M3'] )
-        _base_class.__init__(self, drivers)
+        self.appendDrivers( drivers )
 
-class Stm32M4(CortexM4, _base_class):
+class Stm32M4(CortexM4):
     def __init__( self, drivers=None ):
         CortexM4.__init__( self )
-        self.appendCompilerFlag( ['-DCORTEX_M4'] )
-        _base_class.__init__(self, drivers)
+        self.appendDrivers( drivers )
 
-class Stm32M7(CortexM7, _base_class):
+class Stm32M7(CortexM7):
     def __init__( self, drivers=None ):
         CortexM7.__init__( self )
-        self.appendCompilerFlag( ['-DCORTEX_M7'] )
-        _base_class.__init__(self, drivers)
+        self.appendDrivers( drivers )
 
 
 
