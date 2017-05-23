@@ -20,7 +20,9 @@ class Cortex(VEnvironment):
     _EXTRA_CCFLAGS = []
     _EXTRA_LINKFLAGS = []
 
-    def __init__( self, cmsis_inc=True ):
+    INCLUDE_CMSIS = True
+
+    def __init__( self ):
         VEnvironment.__init__( self )
         assert self._MCPU
         # NOTE: 
@@ -28,7 +30,7 @@ class Cortex(VEnvironment):
         # which will influence how the ld is called and which libs are used
         self.appendCompilerFlag( ['-mcpu=%s'%self._MCPU, '-mthumb'] )
         self.appendLinkFlag( ['-mcpu=%s'%self._MCPU, '-mthumb'] )
-        if cmsis_inc:
+        if self.INCLUDE_CMSIS:
             self.appendPath( ['/CMSIS/Include'] )
         self.appendCompilerFlag(self._EXTRA_CCFLAGS)
         self.appendLinkFlag(self._EXTRA_LINKFLAGS)

@@ -7,7 +7,7 @@ from VEnvironment import Driver
 # TODO: support LPC43xx LPC2xxx ...
 
 class Lpc43xx(CortexM4):
-    def __init__( self, drivers=None, cmsis_inc=True ):
+    def __init__( self, drivers=None ):
         CortexM4.__init__( self )
         self.appendDrivers( drivers )
 
@@ -19,12 +19,12 @@ class Lpc43xx_StartupDriver(Driver):
 
 class Lpc4337(Lpc43xx):
     cpu = 'LPC4337'
-    def __init__(self, startup_driver=True, cmsis_inc=True):
+    def __init__(self, startup_driver=True):
         if startup_driver:
             drivers=[ Lpc43xx_StartupDriver(self.cpu) ]
         else:
             drivers=[]
-        Lpc43xx.__init__( self, drivers=drivers, cmsis_inc=cmsis_inc )
+        Lpc43xx.__init__( self, drivers=drivers )
 
 
 class Lpc4337m0(CortexM0):
