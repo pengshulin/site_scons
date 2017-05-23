@@ -27,3 +27,8 @@ class Lpc4337(Lpc43xx):
         Lpc43xx.__init__( self, drivers=drivers, cmsis_inc=cmsis_inc )
 
 
+class Lpc4337m0(CortexM0):
+    pass
+
+
+
