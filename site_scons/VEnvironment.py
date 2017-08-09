@@ -10,12 +10,21 @@ from os import environ, getenv, getcwd
 from os.path import basename, abspath, isfile, join, splitext, dirname
 from fnmatch import fnmatch 
 from time import strftime
-
+from sys import path as sys_path
+import sys
 
 _SWITCH_CONFIRM = ['1', 'Y', 'y', 'T', 't']
 
 def _getBoolEnv( name ):
     return bool( getenv(name) in _SWITCH_CONFIRM )
+
+def _findRoot():
+    _dir = abspath(getcwd())
+    while not isfile(join(_dir,'root')) and not isfile(join(_dir,'ROOT')):
+        _dir = abspath( join( _dir, '..' ) )
+        if _dir == '/':
+            break 
+    return None if _dir == '/' else _dir
 
 class Driver():
     PATH = []
@@ -37,7 +46,7 @@ class VEnvironment(Environment):
     _DEF_CCFLAGS = ['-Wno-unused-but-set-variable', '-Wall']
     _DEF_CPPPATH = []
     _DEF_LIBPATH = []
-    _DEF_LIBS = []
+    _DEF_LIBS = ['m']
     _DEF_LINKFLAGS = ['-Wl,--gc-sections']
 
     # additional flags
@@ -182,13 +191,7 @@ class VEnvironment(Environment):
             self.appendSource( self._glob(p, expat) )
 
     def findRoot( self ):
-        _dir = abspath(getcwd())
-        while not isfile(join(_dir,'root')) and not isfile(join(_dir,'ROOT')):
-            _dir = abspath( join( _dir, '..' ) )
-            if _dir == '/':
-                break 
-        if _dir != '/':
-            self.root = _dir 
+        self.root = _findRoot()
         print 'scons: root', self.root
         
     def getName( self ):
@@ -306,4 +309,15 @@ class VEnvironment(Environment):
 
    
 
+def loadHalConfig( haldir ):
+    root = _findRoot()
+    if root is None:
+        raise Exception("ROOT not defined")
+    config = join(root, 'hal'+haldir, 'config.py')
+    if not isfile(config):
+        msg = "config.py not exists in %s"% haldir
+        raise Exception(msg)
+    sys.path.append(join(root, 'hal'+haldir) )
+    import config as config
+    return config
 
