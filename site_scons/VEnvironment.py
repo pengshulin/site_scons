@@ -15,7 +15,7 @@ import sys
 
 _SWITCH_CONFIRM = ['1', 'Y', 'y', 'T', 't']
 
-def _getBoolEnv( name ):
+def getBoolEnv( name ):
     return bool( getenv(name) in _SWITCH_CONFIRM )
 
 def _findRoot():
@@ -58,15 +58,15 @@ class VEnvironment(Environment):
 
 
     def _initFromSysEnv( self ):
-        self.VERBOSE = _getBoolEnv( 'VERBOSE' )
-        self.INFO = _getBoolEnv( 'INFO' )
-        self.DEBUG = _getBoolEnv( 'DEBUG' )
+        self.VERBOSE = getBoolEnv( 'VERBOSE' )
+        self.INFO = getBoolEnv( 'INFO' )
+        self.DEBUG = getBoolEnv( 'DEBUG' )
 
     def getEnv( self, name ):
         return getenv(name, '')
 
     def getBoolEnv( self, name ):
-        return _getBoolEnv( name )
+        return getBoolEnv( name )
     
     def _initBuildDate( self ):
         self.BUILD_DATE = strftime("%y-%m-%d %H:%M:%S")
@@ -310,6 +310,9 @@ class VEnvironment(Environment):
    
 
 def loadHalConfig( haldir ):
+    assert isinstance(haldir, str)
+    if haldir.startswith('hal'):
+        haldir = haldir[3:]
     root = _findRoot()
     if root is None:
         raise Exception("ROOT not defined")
