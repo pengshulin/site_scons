@@ -62,14 +62,14 @@ class STM32F2XX_StartupDriver(Driver):
 class STM32F4XX_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32F4xx/Include']
     EX_DEF = {
-        'STM32F407xx': 'STM32F40_41xxx',
-        'STM32F429xx': 'STM32F429_439xx',
+        'STM32F40_41xxx': 'STM32F40_41xxx',
+        #'STM32F429_439xx': 'STM32F429_439xx',
         # TODO: append new chips when needed
         }
 
     def __init__(self, cpu):
         self.SOURCE = [
-            '/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_%s.s'% cpu.lower(), 
+            '/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc_ride7/startup_%s.s'% cpu.lower(), 
             '/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c' ]
         self.CFLAG = []
         self.CFLAG.append( '-D%s'% cpu )
@@ -275,7 +275,7 @@ class Stm32f4(Stm32M4):
 
 
 class Stm32f407xx(Stm32f4):
-    cpu = 'STM32F407xx'
+    cpu = 'STM32F40_41xxx'
 
 
 class Stm32f429xx(Stm32f4):
