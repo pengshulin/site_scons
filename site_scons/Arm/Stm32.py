@@ -166,11 +166,16 @@ class STM32373C_EVAL_Driver(STM32_EVAL_Driver):
     NAME = 'STM32373C_EVAL'
 
 # STemWin
-# NOTE: symbolic link libSTemWin.a needs to be created manually
+# NOTE: symbolic link libSTemWin_CMX_GCC.a needs to be created manually
 class STemWin(Driver):
     PATH = ['/ST/STemWin/inc']
     LIBPATH = ['/ST/STemWin/Lib']
-    LIB = ['STemWin']
+    def __init__(self, cortex='CM4', os=True ):
+        if os:
+            l = 'STemWin_%s_OS_GCC'% cortex
+        else:
+            l = 'STemWin_%s_GCC'% cortex
+        self.LIB.append(l)
 
 
 

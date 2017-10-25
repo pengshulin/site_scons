@@ -1,30 +1,34 @@
 '''Virtual Environment'''
 # mcu build scripts based on scons, designed by PengShulin 
 from SCons.Builder import Builder
+from SCons.Action import Action
 from SCons.Environment import Environment
 from SCons.Errors import StopError
 
 from Toolchain import Gcc
 
-from os import environ, getenv, getcwd
+from os import environ, getenv, getcwd, system
 from os.path import basename, abspath, isfile, join, splitext, dirname
 from fnmatch import fnmatch 
 from time import strftime
 from sys import path as sys_path
 import sys
+from subprocess import check_output
 
-_SWITCH_CONFIRM = ['1', 'Y', 'y', 'T', 't']
+_SWITCH_CONFIRM = ['1', 'Y', 'y', 'T', 't', 'yes', 'Yes', 'YES', 'true', 'True', 'TRUE']
 
 def getBoolEnv( name ):
     return bool( getenv(name) in _SWITCH_CONFIRM )
 
-def _findRoot():
+def _findRoot(relative=False):
     _dir = abspath(getcwd())
+    _dir2 = ''
     while not isfile(join(_dir,'root')) and not isfile(join(_dir,'ROOT')):
         _dir = abspath( join( _dir, '..' ) )
+        _dir2 = join( _dir2, '..' )
         if _dir == '/':
             break 
-    return None if _dir == '/' else _dir
+    return None if _dir == '/' else (_dir2 if relative else _dir)
 
 class Driver():
     PATH = []
@@ -55,12 +59,53 @@ class VEnvironment(Environment):
     _LIBPATH = []
     _LIBS = []
     _LINKFLAGS = []
-
+    _LINTFLAGS = ['-D__GNUC__=4',
+        '+posixlib', '-preproc',
+        '-D__GNUC_VA_LIST',
+        '-D__VALIST=char*',
+        '+quiet',
+        '-linelen 200',
+        '-unrecogcomments',
+        '-imptype',
+        #'-nolib',
+        #'-syntax',
+        '-paramuse',
+        '+try-to-recover',
+        '-exportlocal',
+        '-type',
+        '-likelybool',
+        '-retvalint',
+        '-fcnuse',
+        '-predboolint',
+        '-predboolothers',
+        '-immediatetrans',
+        '-mustdefine',
+        '-compdef',
+        '-boolops',
+        '-nullpass',
+        '-fixedformalarray',
+        '-fullinitblock',
+        '-globstate',
+        '+charindex',
+        '-mustfreefresh',
+        '-mustfreeonly',
+        '-nullassign',
+        '-onlytrans',
+        '-temptrans',
+        '-branchstate',
+        '-usereleased',
+        '-unqualifiedtrans',
+        '-compmempass',
+        '-usedef',
+        #'+skip-iso-headers',
+        ]
 
     def _initFromSysEnv( self ):
         self.VERBOSE = getBoolEnv( 'VERBOSE' )
         self.INFO = getBoolEnv( 'INFO' )
         self.DEBUG = getBoolEnv( 'DEBUG' )
+        self.LINT = getBoolEnv( 'LINT' )
+        self.LINT_FILE = getBoolEnv( 'LINT_FILE' )
 
     def getEnv( self, name ):
         return getenv(name, '')
@@ -144,6 +189,7 @@ class VEnvironment(Environment):
                 ret.append( join(self.root, p[1:]) )
             else:
                 ret.append( p )
+        #print 'applyRoot', ret
         return ret
 
     def appendPath( self, path ):
@@ -160,9 +206,12 @@ class VEnvironment(Environment):
 
     def appendSource( self, source ):
         assert isinstance(source, list) 
+        #print 'appendSource', source
         for f in self.applyRoot(source):
+        #for f in source:
             if not f in self.source:
                 self.source.append(f)
+                #print 'appended', f
 
     def _glob( self, pat, exclude_pat=None ):
         assert isinstance(pat, str) 
@@ -170,8 +219,7 @@ class VEnvironment(Environment):
             result = self.Glob( join(self.root, pat[1:]) )
         else:
             result = self.Glob( pat )
-        #print 'Glob:', pat
-        #print [str(f) for f in result]
+        #print 'Glob:', pat, [str(f) for f in result]
         if exclude_pat:
             ret = []
             for fil in result:
@@ -210,9 +258,62 @@ class VEnvironment(Environment):
             self.linkfile = join(self.root, linkfile[1:])
         else:
             self.linkfile = linkfile
-         
+
+    def appendLintFlag( self, flags ):
+        self._LINTFLAGS.append( flags )
+
+    def prepareLintEnv( self ):
+        try:
+            self.lint_env_inited
+            return
+        except AttributeError:
+            pass
+        cmd = 'splint'
+        p = check_output( ['arm-none-eabi-gcc', '-print-libgcc-file-name'] )
+        cmd += ' -I' + join(dirname(p), 'include')
+        cmd += ' -I/usr/include/newlib'
+        for d in self['CCFLAGS']:
+            if d.startswith('-D'):
+                cmd += ' ' + d
+        for i in self['CPPPATH']:
+            if i.find(' ') == -1:
+                cmd += ' -I' + i
+            else:
+                cmd += ' -I"' + i + '"'
+        for f in self._LINTFLAGS:
+            cmd += ' ' + f
+
+        if self.LINT_FILE:
+            cmd2 = cmd + ' $SOURCE > $TARGET'
+        else:
+            cmd2 = cmd + ' $SOURCE'
+        #print 'lint cmd', cmd
+        #SPLINT_CHECKER = Builder( action=cmd2, suffix='.lint', src_suffix='.c' )
+        #self.Append( BUILDERS={'SPLint': SPLINT_CHECKER} )
+        self.splint_cmd = Action(cmd2)
+
+        self.lint_env_inited = True
+
+    #def makeLintCheck( self ):
+    #    self.prepareLintEnv()
+    #    for sfile in self.source:
+    #        a, b = splitext(str(sfile))
+    #        if b != '.c':
+    #            continue
+    #        lint = self.SPLint( a+'.lint', sfile )
+    #        self.Depends( lint, sfile )
+    #        #print lint, sfile
+    #        #cmd3 = cmd + ' ' + sfile + ' > ' + a+'.lint'
+    #        #cmd3 = cmd + ' ' + sfile
+    #        #print cmd3
+    #        #system( cmd3 )
+    #        #l = Action( cmd3 )
+    #        #self.Depends( l, sfile )
+    #        #self.lint_list.append( l )
+
     def makeApp( self, name=None ):
         '''make application'''
+        self.prepareLintEnv()
         try:
             self._optimize_flags_added
         except AttributeError:
@@ -229,7 +330,17 @@ class VEnvironment(Environment):
         if not name:
             name = self.getName()
         self.appendLinkFlag( ['-Wl,--Map=%s.map'% name] )
-        elffile = self.Program( name + '.elf', self.source )
+        objs = []
+        for sfile in self.source:
+            obj = self.Object(sfile)
+            objs.append( obj )
+            if self.LINT:
+                a, b = splitext(str(sfile))
+                if b == '.c':
+                    self.AddPreAction(obj, self.splint_cmd)
+         
+        elffile = self.Program( name + '.elf', objs )
+        #elffile = self.Program( name + '.elf', self.source )
         binfile = self.Bin( name + '.bin', elffile )
         hexfile = self.Hex( name + '.hex', elffile )
         lstfile = self.Dump( name + '.lst', elffile )
@@ -240,9 +351,19 @@ class VEnvironment(Environment):
         # TODO: add obj dumper if needed
 
     def makeLib( self, name=None ):
+        self.prepareLintEnv()
         if not name:
             name = self.getName()
-        libfile = self.Library( name, self.source )
+        objs = []
+        for sfile in self.source:
+            obj = self.Object(sfile)
+            objs.append( obj )
+            if self.LINT:
+                a, b = splitext(str(sfile))
+                if b == '.c':
+                    self.AddPreAction(obj, self.splint_cmd)
+ 
+        libfile = self.Library( name, objs )
         self.Size( source=libfile )
 
     def makeMDPDF( self, fname ):
