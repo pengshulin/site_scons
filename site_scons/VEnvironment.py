@@ -59,45 +59,15 @@ class VEnvironment(Environment):
     _LIBPATH = []
     _LIBS = []
     _LINKFLAGS = []
-    _LINTFLAGS = ['-D__GNUC__=4',
-        '+posixlib', '-preproc',
-        '-D__GNUC_VA_LIST',
-        '-D__VALIST=char*',
+    # NOTE: load sequence:
+    # 1. load ~/.splintrc
+    # 2. override by ./.splintrc
+    # 3. override by command line args
+    _LINTFLAGS = [
+        '-linelen 1000',  # all message in one line
         '+quiet',
-        '-linelen 200',
-        '-unrecogcomments',
-        '-imptype',
-        #'-nolib',
-        #'-syntax',
-        '-paramuse',
-        '+try-to-recover',
-        '-exportlocal',
-        '-type',
-        '-likelybool',
-        '-retvalint',
-        '-fcnuse',
-        '-predboolint',
-        '-predboolothers',
-        '-immediatetrans',
-        '-mustdefine',
-        '-compdef',
-        '-boolops',
-        '-nullpass',
-        '-fixedformalarray',
-        '-fullinitblock',
-        '-globstate',
-        '+charindex',
-        '-mustfreefresh',
-        '-mustfreeonly',
-        '-nullassign',
-        '-onlytrans',
-        '-temptrans',
-        '-branchstate',
-        '-usereleased',
-        '-unqualifiedtrans',
-        '-compmempass',
-        '-usedef',
-        #'+skip-iso-headers',
+        '-D__GNUC__=4',
+        '-D__builtin_va_list=int',
         ]
 
     def _initFromSysEnv( self ):
@@ -269,8 +239,8 @@ class VEnvironment(Environment):
         except AttributeError:
             pass
         cmd = 'splint'
-        p = check_output( ['arm-none-eabi-gcc', '-print-libgcc-file-name'] )
-        cmd += ' -I' + join(dirname(p), 'include')
+        #p = check_output( ['arm-none-eabi-gcc', '-print-libgcc-file-name'] )
+        #cmd += ' -I' + join(dirname(p), 'include')
         cmd += ' -I/usr/include/newlib'
         for d in self['CCFLAGS']:
             if d.startswith('-D'):
@@ -337,7 +307,8 @@ class VEnvironment(Environment):
             if self.LINT:
                 a, b = splitext(str(sfile))
                 if b == '.c':
-                    self.AddPreAction(obj, self.splint_cmd)
+                    #self.AddPreAction(obj, self.splint_cmd)
+                    self.AddPostAction(obj, self.splint_cmd)
          
         elffile = self.Program( name + '.elf', objs )
         #elffile = self.Program( name + '.elf', self.source )
