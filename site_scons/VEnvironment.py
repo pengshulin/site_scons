@@ -76,6 +76,7 @@ class VEnvironment(Environment):
         self.DEBUG = getBoolEnv( 'DEBUG' )
         self.LINT = getBoolEnv( 'LINT' )
         self.LINT_FILE = getBoolEnv( 'LINT_FILE' )
+        self.NO_PARALLEL = getBoolEnv( 'NO_PARALLEL' )
 
     def getEnv( self, name ):
         return getenv(name, '')
@@ -128,7 +129,8 @@ class VEnvironment(Environment):
         self.Append( BUILDERS={'Dump': DUMP_BUILDER} )
 
         self.findRoot()
-        self.setMultiJobs()
+        if not self.NO_PARALLEL:
+            self.setMultiJobs()
 
     def setMultiJobs(self):
         cpus = 0

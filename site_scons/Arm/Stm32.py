@@ -62,7 +62,7 @@ class STM32F2XX_StartupDriver(Driver):
 class STM32F4XX_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32F4xx/Include']
     EX_DEF = {
-        'STM32F40_41xxx': 'STM32F40_41xxx',
+        #'STM32F40_41xxx': 'STM32F40_41xxx',
         #'STM32F429_439xx': 'STM32F429_439xx',
         # TODO: append new chips when needed
         }
@@ -284,7 +284,7 @@ class Stm32f407xx(Stm32f4):
 
 
 class Stm32f429xx(Stm32f4):
-    cpu = 'STM32F429xx'
+    cpu = 'STM32F429_439xx'
 
 
 # STM32F7xx
