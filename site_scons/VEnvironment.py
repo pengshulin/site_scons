@@ -349,6 +349,17 @@ class VEnvironment(Environment):
         base = splitext(fname)[0]
         self.MDPDF( target='%s.pdf'% base, source='%s.md'% base )
 
+    def makeMDLandSlide( self, fname ):
+        try:
+            self.builder_landslide_html
+        except AttributeError:
+            self.builder_landslide_html = Builder(action='landslide $SOURCES -d $TARGET',
+                       suffix='.html', src_suffix='.md' )
+            self.Append(BUILDERS = {'MDLandSlide': self.builder_landslide_html})
+        base = splitext(fname)[0]
+        self.MDLandSlide( target='%s.html'% base, source='%s.md'% base )
+
+
     def appendOptimizeFlags( self, optimize_flags=None, define_flags=None ):
         if optimize_flags is None:
             if self.DEBUG:
