@@ -127,6 +127,9 @@ class VEnvironment(Environment):
 
         DUMP_BUILDER = Builder( action = tool.OBJDUMP + ' -adhlS $SOURCE > $TARGET', suffix='.lst', src_suffix='.elf' )
         self.Append( BUILDERS={'Dump': DUMP_BUILDER} )
+        
+        MAP_BUILDER = Builder( action = 'touch $TARGET', suffix='.map', src_suffix='.elf' )
+        self.Append( BUILDERS={'Map': MAP_BUILDER} )
 
         self.findRoot()
         if not self.NO_PARALLEL:
@@ -317,9 +320,11 @@ class VEnvironment(Environment):
         binfile = self.Bin( name + '.bin', elffile )
         hexfile = self.Hex( name + '.hex', elffile )
         lstfile = self.Dump( name + '.lst', elffile )
+        mapfile = self.Map( name + '.map', elffile )
         self.Depends( binfile, elffile )
         self.Depends( hexfile, elffile )
         self.Depends( lstfile, elffile )
+        self.Depends( mapfile, elffile )
         self.Size( source=elffile )
         # TODO: add obj dumper if needed
 
@@ -349,15 +354,21 @@ class VEnvironment(Environment):
         base = splitext(fname)[0]
         self.MDPDF( target='%s.pdf'% base, source='%s.md'% base )
 
-    def makeMDLandSlide( self, fname ):
+    def makeMDLandSlide( self, fname, pdf_mode=False ):
         try:
             self.builder_landslide_html
         except AttributeError:
             self.builder_landslide_html = Builder(action='landslide $SOURCES -d $TARGET',
                        suffix='.html', src_suffix='.md' )
-            self.Append(BUILDERS = {'MDLandSlide': self.builder_landslide_html})
+            self.builder_landslide_pdf = Builder(action='landslide $SOURCES -d $TARGET',
+                       suffix='.pdf', src_suffix='.md' )
+            self.Append(BUILDERS = {'MDLandSlideHTML': self.builder_landslide_html})
+            self.Append(BUILDERS = {'MDLandSlidePDF': self.builder_landslide_pdf})
         base = splitext(fname)[0]
-        self.MDLandSlide( target='%s.html'% base, source='%s.md'% base )
+        if pdf_mode:
+            self.MDLandSlidePDF( target='%s.pdf'% base, source='%s.md'% base )
+        else:
+            self.MDLandSlideHTML( target='%s.html'% base, source='%s.md'% base )
 
 
     def appendOptimizeFlags( self, optimize_flags=None, define_flags=None ):
