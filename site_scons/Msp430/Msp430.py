@@ -1,5 +1,6 @@
 '''MSP430 MCUs'''
 # mcu build scripts based on scons, designed by PengShulin 
+# Peng Shulin <trees_peng@163.com> 2018
 from Toolchain import Gcc
 from VEnvironment import VEnvironment
 

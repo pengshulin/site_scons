@@ -1,5 +1,6 @@
 '''cortex based controller'''
 # mcu build scripts based on scons, designed by PengShulin 
+# Peng Shulin <trees_peng@163.com> 2018
 from Toolchain import Gcc
 from VEnvironment import VEnvironment, Driver
 
@@ -22,6 +23,7 @@ class Cortex(VEnvironment):
 
     INCLUDE_CMSIS = True
 
+
     def __init__( self ):
         VEnvironment.__init__( self )
         assert self._MCPU
@@ -42,25 +44,29 @@ class Cortex(VEnvironment):
 class CortexM0(Cortex):
     _MCPU = 'cortex-m0'
     _EXTRA_CCFLAGS = ['-DCORTEX_M0', '-DCORE_M0', '-mfloat-abi=soft']
+    freertos_port = 'ARM_CM0'
 
 class CortexM0plus(Cortex):
     _MCPU = 'cortex-m0plus'
     _EXTRA_CCFLAGS = ['-DCORTEX_M0', '-DCORE_M0', '-mfloat-abi=soft']
+    freertos_port = 'ARM_CM0'
 
 class CortexM3(Cortex):
     _MCPU = 'cortex-m3'
     _EXTRA_CCFLAGS = ['-DCORTEX_M3', '-DCORE_M3', '-mfloat-abi=soft']
+    freertos_port = 'ARM_CM3'
 
 class CortexM4(Cortex):
     _MCPU = 'cortex-m4'
     _EXTRA_CCFLAGS = ['-DCORTEX_M4', '-DCORE_M4', '-mfloat-abi=hard', '-mfpu=fpv4-sp-d16', ]
     _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16', ]
+    freertos_port = 'ARM_CM4F'
 
 class CortexM7(Cortex):
     _MCPU = 'cortex-m7'
     _EXTRA_CCFLAGS = ['-DCORTEX_M7', '-DCORE_M7', '-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
     _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
-
+    freertos_port = 'ARM_CM7'
 
 # CMSIS-DSP driver
 class CMSIS_DSP_Driver(Driver):

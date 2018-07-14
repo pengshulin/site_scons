@@ -1,5 +1,6 @@
 '''Virtual Environment'''
 # mcu build scripts based on scons, designed by PengShulin 
+# Peng Shulin <trees_peng@163.com> 2018
 from SCons.Builder import Builder
 from SCons.Action import Action
 from SCons.Environment import Environment
@@ -112,7 +113,8 @@ class VEnvironment(Environment):
 
         self.Append( CCFLAGS=self._CCFLAGS )
         self.Append( CPPPATH=self._CPPPATH )
-        self.Append( LIBS=self._LIBS )
+        if self._LIBS:
+            self.Append( LIBS=self._LIBS )
         self.Append( LIBPATH=self._LIBPATH )
         self.Append( LINKFLAGS=self._LINKFLAGS )
 
@@ -128,8 +130,8 @@ class VEnvironment(Environment):
         DUMP_BUILDER = Builder( action = tool.OBJDUMP + ' -adhlS $SOURCE > $TARGET', suffix='.lst', src_suffix='.elf' )
         self.Append( BUILDERS={'Dump': DUMP_BUILDER} )
         
-        MAP_BUILDER = Builder( action = 'touch $TARGET', suffix='.map', src_suffix='.elf' )
-        self.Append( BUILDERS={'Map': MAP_BUILDER} )
+        #MAP_BUILDER = Builder( action = 'touch $TARGET', suffix='.map', src_suffix='.elf' )
+        #self.Append( BUILDERS={'Map': MAP_BUILDER} )
 
         self.findRoot()
         if not self.NO_PARALLEL:
@@ -168,16 +170,21 @@ class VEnvironment(Environment):
         return ret
 
     def appendPath( self, path ):
-        assert isinstance(path, list) 
-        self.Append( CPPPATH=self.applyRoot(path) )
+        if path:
+            assert isinstance(path, list) 
+            self.Append( CPPPATH=self.applyRoot(path) )
     
     def appendLibPath( self, path ):
-        assert isinstance(path, list) 
-        self.Append( LIBPATH=self.applyRoot(path) )
+        if path:
+            assert isinstance(path, list) 
+            self.Append( LIBPATH=self.applyRoot(path) )
         
     def appendLib( self, lib ):
-        assert isinstance(lib, list) 
-        self.Append( LIBS=lib )
+        if lib:
+            assert isinstance(lib, list)
+            for l in lib:
+                assert l != 'lib'
+            self.Append( LIBS=lib )
 
     def appendSource( self, source ):
         assert isinstance(source, list) 
@@ -320,11 +327,11 @@ class VEnvironment(Environment):
         binfile = self.Bin( name + '.bin', elffile )
         hexfile = self.Hex( name + '.hex', elffile )
         lstfile = self.Dump( name + '.lst', elffile )
-        mapfile = self.Map( name + '.map', elffile )
+        #mapfile = self.Map( name + '.map', elffile )
         self.Depends( binfile, elffile )
         self.Depends( hexfile, elffile )
         self.Depends( lstfile, elffile )
-        self.Depends( mapfile, elffile )
+        #self.Depends( mapfile, elffile )
         self.Size( source=elffile )
         # TODO: add obj dumper if needed
 
@@ -376,7 +383,7 @@ class VEnvironment(Environment):
             if self.DEBUG:
                 optimize_flags = ['-g', '-O0']
             else:
-                optimize_flags = ['-O3', '-Werror']
+                optimize_flags = ['-g', '-O3', '-Werror']
         self.appendCompilerFlag(optimize_flags)
         self._optimize_flags_added = True
         if define_flags is None:
@@ -407,6 +414,8 @@ class VEnvironment(Environment):
                 self.appendDriver(d)
 
 
+    def resetSources( self ):
+        self.source = []
 
     appendPaths = appendPath
     appendGlobSources = appendGlobSource
@@ -423,9 +432,44 @@ class VEnvironment(Environment):
     appendDefinedFlag = appendDefineFlags
     appendDefinedFlags = appendDefineFlags
 
+    def appendMcush( self, vfs=False, vfs_spiffs=False ):
+        self.appendPath( ['/mcush'] )
+        self.appendGlobSource( ['/mcush/*.c'] )
+  
+    def appendFreertos( self, heap=3 ):
+        self.appendPath( [
+            '/libFreeRTOS',
+            '/libFreeRTOS/include',
+            '/libFreeRTOS/portable/GCC/%s'% self.freertos_port,
+            ] )
+        self.appendGlobSource( [
+            '/libFreeRTOS/*.c',
+            '/libFreeRTOS/portable/MemMang/heap_%d.c'% heap,
+            '/libFreeRTOS/portable/GCC/%s/port.c'% self.freertos_port,
+            ] )
+    
+    def appendHal( self, haldir, paths=None, sources=None ):
+        self.appendPath( ['/hal%s'% haldir] )
+        self.appendGlobSource( ['/hal%s/*.c'% haldir] )
+        if paths:
+            for p in paths:
+                self.appendPath( ['/hal%s/%s'% (haldir, p)] )
+        if sources:
+            for s in sources:
+                self.appendGlobSource( ['/hal%s/%s'% (haldir, s)] )
    
+    appendFreeRTOS = appendFreertos 
+    appendFREERTOS = appendFreertos 
+    appendMCUSH = appendMcush
+    appendHAL = appendHal
 
-def loadHalConfig( haldir ):
+
+
+# called from SConstruct
+# search in 'halXXXXX' directory for 'config.py'
+# the config script must include a basic build environment object 'env'
+# if hal/mcush/freertos switch is set, .c/.h codes will be included
+def loadHalConfig( haldir, hal=True, mcush=True, freertos=True ):
     assert isinstance(haldir, str)
     if haldir.startswith('hal'):
         haldir = haldir[3:]
@@ -438,5 +482,20 @@ def loadHalConfig( haldir ):
         raise Exception(msg)
     sys.path.append(join(root, 'hal'+haldir) )
     import config as config
+    config.env.haldir = haldir
+    if hal:
+        try:
+            config.paths
+        except AttributeError:
+            config.paths = []
+        try:
+            config.sources
+        except AttributeError:
+            config.sources = []
+        config.env.appendHal( haldir, config.paths, config.sources )
+    if mcush:
+        config.env.appendMcush()
+    if freertos:
+        config.env.appendFreertos()
     return config
 
