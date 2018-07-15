@@ -3,7 +3,7 @@
 # Peng Shulin <trees_peng@163.com> 2018
 from Cortex import CortexM0, CortexM3, CortexM4, CortexM7
 from Cortex import CMSIS_DSP_Driver
-from VEnvironment import Driver
+from VEnvironment import Driver, hal_config
 
 # TODO: support LPC43xx LPC2xxx ...
 

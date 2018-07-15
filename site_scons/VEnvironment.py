@@ -432,9 +432,13 @@ class VEnvironment(Environment):
     appendDefinedFlag = appendDefineFlags
     appendDefinedFlags = appendDefineFlags
 
-    def appendMcush( self, vfs=False, vfs_spiffs=False ):
+    def appendMcush( self ):
         self.appendPath( ['/mcush'] )
         self.appendGlobSource( ['/mcush/*.c'] )
+  
+    def appendSpiffs( self ):
+        self.appendPath( ['/libspiffs'] )
+        self.appendGlobSource( ['/libspiffs/*.c'] )
   
     def appendFreertos( self, heap=3 ):
         self.appendPath( [
@@ -458,18 +462,27 @@ class VEnvironment(Environment):
             for s in sources:
                 self.appendGlobSource( ['/hal%s/%s'% (haldir, s)] )
    
-    appendFreeRTOS = appendFreertos 
-    appendFREERTOS = appendFreertos 
-    appendMCUSH = appendMcush
-    appendHAL = appendHal
+    
+class config():
+    # these configurations will be read when import halXXX/config.py
+    load_mcush = True
+    load_hal = True
+    load_freertos = True
+    use_vfs = True
+    use_romfs = True
+    use_fcfs = True
+    use_spiffs = False
+    use_fatfs = False
+    use_eth = False
 
-
+hal_config = config()
 
 # called from SConstruct
 # search in 'halXXXXX' directory for 'config.py'
 # the config script must include a basic build environment object 'env'
-# if hal/mcush/freertos switch is set, .c/.h codes will be included
-def loadHalConfig( haldir, hal=True, mcush=True, freertos=True ):
+# if load_(hal/mcush/freertos) switch is set (default), .c/.h codes will be included
+def loadHalConfig( haldir, *args, **kwargs ):
+    global hal_config
     assert isinstance(haldir, str)
     if haldir.startswith('hal'):
         haldir = haldir[3:]
@@ -481,9 +494,15 @@ def loadHalConfig( haldir, hal=True, mcush=True, freertos=True ):
         msg = "config.py not exists in %s"% haldir
         raise Exception(msg)
     sys.path.append(join(root, 'hal'+haldir) )
+    # prepare hal_config variable
+    for k,v in kwargs.items():
+        hal_config.__dict__[k] = v
+    # load from config.py
     import config as config
     config.env.haldir = haldir
-    if hal:
+    # auto load .c/.h sources
+    # halXXX
+    if hal_config.load_hal:
         try:
             config.paths
         except AttributeError:
@@ -493,9 +512,18 @@ def loadHalConfig( haldir, hal=True, mcush=True, freertos=True ):
         except AttributeError:
             config.sources = []
         config.env.appendHal( haldir, config.paths, config.sources )
-    if mcush:
+    if hal_config.load_mcush:
         config.env.appendMcush()
-    if freertos:
+    if hal_config.load_freertos:
         config.env.appendFreertos()
+    # apply vfs replated
+    config.env.appendDefineFlags( [ 'MCUSH_VFS=%d'% int(hal_config.use_vfs) ] )
+    if hal_config.use_vfs:
+        config.env.appendDefineFlags( [ 'MCUSH_ROMFS=%d'% int(hal_config.use_romfs) ] )
+        config.env.appendDefineFlags( [ 'MCUSH_FCFS=%d'% int(hal_config.use_fcfs) ] )
+        config.env.appendDefineFlags( [ 'MCUSH_SPIFFS=%d'% int(hal_config.use_spiffs) ] )
+    if hal_config.use_spiffs:
+        config.env.appendSpiffs()
     return config
+
 

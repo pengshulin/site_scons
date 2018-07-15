@@ -3,8 +3,7 @@
 # Peng Shulin <trees_peng@163.com> 2018
 from Cortex import CortexM0, CortexM3, CortexM4, CortexM7
 from Cortex import CMSIS_DSP_Driver
-from VEnvironment import Driver
-
+from VEnvironment import Driver, hal_config
 
 # Startup driver
 class STM32F0XX_StartupDriver(Driver):
@@ -125,7 +124,7 @@ class STM32F4XX_StdPeripheralDriver(Driver):
 
 class STM32F7XX_StdPeripheralDriver(Driver):
     PATH = ['/ST/STM32F7xx_HAL_Driver/Inc']
-    GLOBSOURCE = ['/ST/STM32F7xx_HAL_Driver/Src/*.c']
+    GLOBSOURCE = ['/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_*.c']
     #CFLAG = ['-DUSE_STDPERIPH_DRIVER']
 
 
