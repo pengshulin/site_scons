@@ -470,7 +470,7 @@ class config():
     load_freertos = True
     use_vfs = True
     use_romfs = True
-    use_fcfs = True
+    use_fcfs = False
     use_spiffs = False
     use_fatfs = False
     use_eth = False
@@ -500,6 +500,7 @@ def loadHalConfig( haldir, *args, **kwargs ):
     # load from config.py
     import config as config
     config.env.haldir = haldir
+    # NOTE: hal_config contents may be modified by 'import config'
     # auto load .c/.h sources
     # halXXX
     if hal_config.load_hal:
