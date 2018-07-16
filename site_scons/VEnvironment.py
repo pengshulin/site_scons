@@ -464,16 +464,23 @@ class VEnvironment(Environment):
    
     
 class config():
-    # these configurations will be read when import halXXX/config.py
-    load_mcush = True
-    load_hal = True
-    load_freertos = True
+    paths = []
+    sources = []
+    # these configurations are treated as keyword arguments when import halXXX/config.py
+    append_mcush = True
+    append_hal = True
+    append_freertos = True
     use_vfs = True
     use_romfs = True
     use_fcfs = False
     use_spiffs = False
     use_fatfs = False
     use_eth = False
+
+    def __getattr__( self, key ):
+        self.__dict__[key] = None  # visit unknown attribute
+        return None
+    
 
 hal_config = config()
 
@@ -484,6 +491,7 @@ hal_config = config()
 def loadHalConfig( haldir, *args, **kwargs ):
     global hal_config
     assert isinstance(haldir, str)
+    # check if haldir/root/config.py exists
     if haldir.startswith('hal'):
         haldir = haldir[3:]
     root = _findRoot()
@@ -493,8 +501,9 @@ def loadHalConfig( haldir, *args, **kwargs ):
     if not isfile(config):
         msg = "config.py not exists in %s"% haldir
         raise Exception(msg)
+    # append to path so that config.py can be imported
     sys.path.append(join(root, 'hal'+haldir) )
-    # prepare hal_config variable
+    # prepare hal_config global variable for import
     for k,v in kwargs.items():
         hal_config.__dict__[k] = v
     # load from config.py
@@ -502,29 +511,20 @@ def loadHalConfig( haldir, *args, **kwargs ):
     config.env.haldir = haldir
     # NOTE: hal_config contents may be modified by 'import config'
     # auto load .c/.h sources
-    # halXXX
-    if hal_config.load_hal:
-        try:
-            config.paths
-        except AttributeError:
-            config.paths = []
-        try:
-            config.sources
-        except AttributeError:
-            config.sources = []
-        config.env.appendHal( haldir, config.paths, config.sources )
-    if hal_config.load_mcush:
+    if hal_config.append_hal:
+        config.env.appendHal( haldir, hal_config.paths, hal_config.sources )
+    if hal_config.append_mcush:
         config.env.appendMcush()
-    if hal_config.load_freertos:
+    if hal_config.append_freertos:
         config.env.appendFreertos()
-    # apply vfs replated
+    # apply vfs related
     config.env.appendDefineFlags( [ 'MCUSH_VFS=%d'% int(hal_config.use_vfs) ] )
     if hal_config.use_vfs:
         config.env.appendDefineFlags( [ 'MCUSH_ROMFS=%d'% int(hal_config.use_romfs) ] )
         config.env.appendDefineFlags( [ 'MCUSH_FCFS=%d'% int(hal_config.use_fcfs) ] )
         config.env.appendDefineFlags( [ 'MCUSH_SPIFFS=%d'% int(hal_config.use_spiffs) ] )
-    if hal_config.use_spiffs:
-        config.env.appendSpiffs()
+        if hal_config.use_spiffs:
+            config.env.appendSpiffs()
     return config
 
 
