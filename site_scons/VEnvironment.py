@@ -461,7 +461,9 @@ class VEnvironment(Environment):
         if sources:
             for s in sources:
                 self.appendGlobSource( ['/hal%s/%s'% (haldir, s)] )
-   
+ 
+ 
+haldir = getenv('HALDIR', None) 
     
 class config():
     paths = []
