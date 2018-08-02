@@ -439,7 +439,11 @@ class VEnvironment(Environment):
     def appendSpiffs( self ):
         self.appendPath( ['/libspiffs'] )
         self.appendGlobSource( ['/libspiffs/*.c'] )
-  
+
+    def appendFatfs( self ):
+        self.appendPath( ['/libFatFs/source'] )
+        self.appendGlobSource( ['/libFatFs/source/*.c'] )
+   
     def appendFreertos( self, heap=3 ):
         self.appendPath( [
             '/libFreeRTOS',
@@ -525,8 +529,11 @@ def loadHalConfig( haldir, *args, **kwargs ):
         config.env.appendDefineFlags( [ 'MCUSH_ROMFS=%d'% int(hal_config.use_romfs) ] )
         config.env.appendDefineFlags( [ 'MCUSH_FCFS=%d'% int(hal_config.use_fcfs) ] )
         config.env.appendDefineFlags( [ 'MCUSH_SPIFFS=%d'% int(hal_config.use_spiffs) ] )
+        config.env.appendDefineFlags( [ 'MCUSH_FATFS=%d'% int(hal_config.use_fatfs) ] )
         if hal_config.use_spiffs:
             config.env.appendSpiffs()
+        if hal_config.use_fatfs:
+            config.env.appendFatfs()
     return config
 
 
