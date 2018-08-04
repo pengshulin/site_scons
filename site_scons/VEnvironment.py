@@ -48,7 +48,8 @@ class VEnvironment(Environment):
     _TOOLCHAIN = Gcc
 
     # default flags
-    _DEF_CCFLAGS = ['-Wno-unused-but-set-variable', '-Wall']
+    _DEF_CCFLAGS = ['-Wno-unused-but-set-variable', '-Wall',
+                    '-ffunction-sections', '-fdata-sections']
     _DEF_CPPPATH = []
     _DEF_LIBPATH = []
     _DEF_LIBS = ['m']
