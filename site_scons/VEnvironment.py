@@ -49,6 +49,7 @@ class VEnvironment(Environment):
 
     # default flags
     _DEF_CCFLAGS = ['-Wno-unused-but-set-variable', '-Wall',
+                    #'-pedantic',
                     '-ffunction-sections', '-fdata-sections']
     _DEF_CPPPATH = []
     _DEF_LIBPATH = []
@@ -485,8 +486,11 @@ class config():
     use_eth = False
 
     def __getattr__( self, key ):
-        self.__dict__[key] = None  # visit unknown attribute
-        return None
+        if self.__dict__.has_key( key ):
+            return self.__dict__[key]
+        else:
+            self.__dict__[key] = None  # visit unknown attribute
+            return None
     
 
 hal_config = config()
@@ -513,6 +517,7 @@ def loadHalConfig( haldir, *args, **kwargs ):
     # prepare hal_config global variable for import
     for k,v in kwargs.items():
         hal_config.__dict__[k] = v
+    print hal_config.__dict__
     # load from config.py
     import config as config
     config.env.haldir = haldir
