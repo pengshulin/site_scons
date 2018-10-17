@@ -148,7 +148,7 @@ class VEnvironment(Environment):
         except:
             pass
         if cpus > 1:
-            #print 'cpus', cpus
+            #print( 'scons: cpu number %d'% cpus )
             self.SetOption('num_jobs', cpus)
 
     def appendCompilerFlag( self, flag ):
@@ -224,7 +224,7 @@ class VEnvironment(Environment):
 
     def findRoot( self ):
         self.root = _findRoot()
-        print 'scons: root', self.root
+        print( 'scons: root ' + self.root )
         
     def getName( self ):
         dirname = basename(getcwd())
@@ -517,7 +517,11 @@ def loadHalConfig( haldir, *args, **kwargs ):
     # prepare hal_config global variable for import
     for k,v in kwargs.items():
         hal_config.__dict__[k] = v
-    print hal_config.__dict__
+    # print to console
+    if hal_config.__dict__:
+        print( 'scons: hal_config %s'% (','.join(['%s=%s'% (str(k),str(v)) for k,v in hal_config.__dict__.items()])) )
+    else:
+        print( 'scons: hal_config default' )
     # load from config.py
     import config as config
     config.env.haldir = haldir
