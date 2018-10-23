@@ -57,41 +57,35 @@ class STM32F2XX_StartupDriver(Driver):
         self.CFLAG = []
         self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
-
+class STM32F4XX_LegacyStartupDriver(Driver):
+    PATH = ['/CMSIS/Device/ST/STM32F4xx_legacy/Include']
+    def __init__(self, cpu_group):
+        self.SOURCE = [
+            '/CMSIS/Device/ST/STM32F4xx_legacy/Source/Templates/gcc_ride7/startup_%s.s'% cpu_group.lower(), 
+            '/CMSIS/Device/ST/STM32F4xx_legacy/Source/Templates/system_stm32f4xx.c' ]
+        self.CFLAG = []
+        self.CFLAG.append( '-D%s'% cpu_group )
+        self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
 class STM32F4XX_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32F4xx/Include']
-    EX_DEF = {
-        #'STM32F40_41xxx': 'STM32F40_41xxx',
-        #'STM32F429_439xx': 'STM32F429_439xx',
-        # TODO: append new chips when needed
-        }
-
     def __init__(self, cpu):
         self.SOURCE = [
-            '/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc_ride7/startup_%s.s'% cpu.lower(), 
+            '/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_%s.s'% cpu.lower(), 
             '/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c' ]
         self.CFLAG = []
         self.CFLAG.append( '-D%s'% cpu )
-        if cpu in self.EX_DEF.keys():
-            self.CFLAG.append( '-D%s'% self.EX_DEF[cpu] )
         self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
 
 class STM32F7XX_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32F7xx/Include']
-    EX_DEF = {
-        # TODO: append new chips when needed
-        }
-
     def __init__(self, cpu):
         self.SOURCE = [
             '/CMSIS/Device/ST/STM32F7xx/Source/Templates/gcc/startup_%s.s'% cpu.lower(), 
             '/CMSIS/Device/ST/STM32F7xx/Source/Templates/system_stm32f7xx.c' ]
         self.CFLAG = []
         self.CFLAG.append( '-D%s'% cpu )
-        if cpu in self.EX_DEF.keys():
-            self.CFLAG.append( '-D%s'% self.EX_DEF[cpu] )
         self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
 
@@ -122,10 +116,24 @@ class STM32F4XX_StdPeripheralDriver(Driver):
     GLOBSOURCE = ['/ST/STM32F4xx_StdPeriph_Driver/src/*.c']
     CFLAG = ['-DUSE_STDPERIPH_DRIVER']
 
-class STM32F7XX_StdPeripheralDriver(Driver):
+# HAL Driver
+class STM32F1XX_HAL_Driver(Driver):
+    PATH = ['/ST/STM32F1xx_HAL_Driver/Inc']
+    GLOBSOURCE = ['/ST/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal*.c']
+    GLOBSOURCE_EX = ['/ST/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_*template.c']
+    CFLAG = ['-DUSE_HAL_DRIVER']
+
+class STM32F4XX_HAL_Driver(Driver):
+    PATH = ['/ST/STM32F4xx_HAL_Driver/Inc']
+    GLOBSOURCE = ['/ST/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal*.c']
+    GLOBSOURCE_EX = ['/ST/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_*template.c']
+    CFLAG = ['-DUSE_HAL_DRIVER']
+
+class STM32F7XX_HAL_Driver(Driver):
     PATH = ['/ST/STM32F7xx_HAL_Driver/Inc']
     GLOBSOURCE = ['/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_*.c']
-    #CFLAG = ['-DUSE_STDPERIPH_DRIVER']
+    CFLAG = ['-DUSE_HAL_DRIVER']
+
 
 
 
@@ -133,6 +141,34 @@ class STM32F7XX_StdPeripheralDriver(Driver):
 class STM32_USB_FS_Driver(Driver):
     PATH = ['/ST/STM32_USB-FS-Device_Driver/inc']
     GLOBSOURCE = ['/ST/STM32_USB-FS-Device_Driver/src/*.c']
+
+# USB device driver
+class STM32_USB_DEVICE_Driver(Driver):
+    PATH = ['/ST/STM32_USB_Device_Library/Core/Inc']
+    GLOBSOURCE = ['/ST/STM32_USB_Device_Library/Core/Src/usbd_*.c']
+    GLOBSOURCE_EX = ['/ST/STM32_USB_Device_Library/Core/Src/usbd_*template.c']
+    def __init__(self):
+        self.PATH.append('/ST/STM32_USB_Device_Library/Class/%s/Inc'% self.CLASS)
+        self.SOURCE.append('/ST/STM32_USB_Device_Library/Class/%s/Src/usbd_%s.c'% (self.CLASS, self.CLASS.lower()) )
+
+class STM32_USB_DEVICE_AUDIO_Driver(STM32_USB_DEVICE_Driver):
+    CLASS = 'AUDIO'
+
+class STM32_USB_DEVICE_CDC_Driver(STM32_USB_DEVICE_Driver):
+    CLASS = 'CDC'
+
+class STM32_USB_DEVICE_CustomHID_Driver(STM32_USB_DEVICE_Driver):
+    CLASS = 'CustomHID'
+
+class STM32_USB_DEVICE_DFU_Driver(STM32_USB_DEVICE_Driver):
+    CLASS = 'DFU'
+
+class STM32_USB_DEVICE_HID_Driver(STM32_USB_DEVICE_Driver):
+    CLASS = 'HID'
+
+class STM32_USB_DEVICE_MSC_Driver(STM32_USB_DEVICE_Driver):
+    CLASS = 'MSC'
+
 
 # Touch Driver
 class STM32_Touch_Driver(Driver):
@@ -273,18 +309,24 @@ class Stm32f2(Stm32M3):
 
 # STM32F4xx
 class Stm32f4(Stm32M4):
-    def __init__(self):
-        Stm32M4.__init__( self, drivers=[
-            STM32F4XX_StartupDriver(self.cpu),
-            STM32F4XX_StdPeripheralDriver() ] )
-
+    def __init__(self, use_hal_driver=False):
+        if use_hal_driver:
+            Stm32M4.__init__( self, drivers=[
+                STM32F4XX_StartupDriver(self.cpu),
+                STM32F4XX_HAL_Driver() ] )
+        else:
+            Stm32M4.__init__( self, drivers=[
+                STM32F4XX_LegacyStartupDriver(self.cpu_group),
+                STM32F4XX_StdPeripheralDriver() ] )
 
 class Stm32f407xx(Stm32f4):
-    cpu = 'STM32F40_41xxx'
+    cpu = 'STM32F407xx'
+    cpu_group = 'STM32F40_41xxx'
 
 
 class Stm32f429xx(Stm32f4):
-    cpu = 'STM32F429_439xx'
+    cpu = 'STM32F429xx'
+    cpu_group = 'STM32F429_439xx'
 
 
 # STM32F7xx

@@ -10,7 +10,7 @@ from Toolchain import Gcc
 
 from os import environ, getenv, getcwd, system
 from os.path import basename, abspath, isfile, join, splitext, dirname
-from fnmatch import fnmatch 
+from fnmatch import fnmatchcase
 from time import strftime
 from sys import path as sys_path
 import sys
@@ -35,6 +35,7 @@ class Driver():
     PATH = []
     SOURCE = []
     GLOBSOURCE = []
+    GLOBSOURCE_EX = None
     CFLAG = []
     LIBPATH = []
     LIB = []
@@ -203,12 +204,20 @@ class VEnvironment(Environment):
             result = self.Glob( join(self.root, pat[1:]) )
         else:
             result = self.Glob( pat )
-        #print 'Glob:', pat, [str(f) for f in result]
+        #print 'Glob:', pat, [str(f) for f in result], exclude_pat
         if exclude_pat:
+            #print 'Expat:', exclude_pat
             ret = []
             for fil in result:
-                if not fnmatch( str(fil), exclude_pat ):
+                fname = unicode(fil)
+                match = False
+                for p in exclude_pat:
+                    if fnmatchcase( fname, p ):
+                        match = True
+                        break
+                if not match:
                     ret.append( fil )
+            #print 'Glob filtered:', [str(f) for f in ret],
             return ret
         else:
             return result
@@ -217,8 +226,9 @@ class VEnvironment(Environment):
         assert isinstance(pat, list) 
         p = self.applyRoot(pat)
         if expat is not None:
-            assert isinstance(expat, str) 
-            expat = self.applyRoot([expat])[0]
+            #print type(expat), expat
+            assert isinstance(expat, list) 
+            expat = self.applyRoot(expat)
         for p in pat:
             self.appendSource( self._glob(p, expat) )
 
@@ -406,7 +416,7 @@ class VEnvironment(Environment):
             self.appendLibPath( d.LIBPATH )
             self.appendLib( d.LIB )
             self.appendSource( d.SOURCE )
-            self.appendGlobSource( d.GLOBSOURCE )
+            self.appendGlobSource( d.GLOBSOURCE, d.GLOBSOURCE_EX )
             self.appendCompilerFlag( d.CFLAG )
             self.appendLinkFlag( d.LDFLAG )
 
