@@ -5,6 +5,7 @@ from Cortex import CortexM0, CortexM3, CortexM4, CortexM7
 from Cortex import CMSIS_DSP_Driver
 from VEnvironment import Driver, hal_config
 
+
 # Startup driver
 class STM32F0XX_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32F0xx/Include']
@@ -26,7 +27,6 @@ class STM32F0XX_StartupDriver(Driver):
             self.CFLAG.append( '-D%s'% self.EX_DEF[cpu] )
         self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
-
 class STM32F10X_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32F10x/Include']
     def __init__(self, density):
@@ -36,7 +36,6 @@ class STM32F10X_StartupDriver(Driver):
             '/CMSIS/Device/ST/STM32F10x/Source/Templates/system_stm32f10x.c' ]
         self.CFLAG = ['-DSTM32F10X_%s'% density.upper()]
         self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
-
 
 class STM32L1XX_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32L1xx/Include']
@@ -77,7 +76,6 @@ class STM32F4XX_StartupDriver(Driver):
         self.CFLAG.append( '-D%s'% cpu )
         self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
-
 class STM32F7XX_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32F7xx/Include']
     def __init__(self, cpu):
@@ -87,7 +85,6 @@ class STM32F7XX_StartupDriver(Driver):
         self.CFLAG = []
         self.CFLAG.append( '-D%s'% cpu )
         self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
-
 
 
 # Standard Peripheral driver
@@ -116,6 +113,7 @@ class STM32F4XX_StdPeripheralDriver(Driver):
     GLOBSOURCE = ['/ST/STM32F4xx_StdPeriph_Driver/src/*.c']
     CFLAG = ['-DUSE_STDPERIPH_DRIVER']
 
+
 # HAL Driver
 class STM32F1XX_HAL_Driver(Driver):
     PATH = ['/ST/STM32F1xx_HAL_Driver/Inc']
@@ -135,12 +133,33 @@ class STM32F7XX_HAL_Driver(Driver):
     CFLAG = ['-DUSE_HAL_DRIVER']
 
 
+# LL Driver
+class STM32F1XX_LL_Driver(Driver):
+    PATH = ['/ST/STM32F1xx_HAL_Driver/Inc']
+    GLOBSOURCE = ['/ST/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll*.c']
+    GLOBSOURCE_EX = ['/ST/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_*template.c']
+    CFLAG = ['-DUSE_HAL_DRIVER']
+
+class STM32F4XX_LL_Driver(Driver):
+    PATH = ['/ST/STM32F4xx_HAL_Driver/Inc']
+    GLOBSOURCE = ['/ST/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll*.c']
+    GLOBSOURCE_EX = ['/ST/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_*template.c']
+    CFLAG = ['-DUSE_HAL_DRIVER']
+
+class STM32F7XX_LL_Driver(Driver):
+    PATH = ['/ST/STM32F7xx_HAL_Driver/Inc']
+    GLOBSOURCE = ['/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_*.c']
+    GLOBSOURCE_EX = ['/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_*template.c']
+    CFLAG = ['-DUSE_HAL_DRIVER']
+
+
 
 
 # USB Full Speed driver
 class STM32_USB_FS_Driver(Driver):
     PATH = ['/ST/STM32_USB-FS-Device_Driver/inc']
     GLOBSOURCE = ['/ST/STM32_USB-FS-Device_Driver/src/*.c']
+
 
 # USB device driver
 class STM32_USB_DEVICE_Driver(Driver):
@@ -175,6 +194,7 @@ class STM32_Touch_Driver(Driver):
     PATH = ['/ST/STMTouch_Driver/inc', '/ST/STMTouch_Driver/inc/to adapt']
     GLOBSOURCE = ['/ST/STMTouch_Driver/src/*.c']
 
+
 # EVAL Board Driver
 class STM32_EVAL_Driver(Driver):
     def __init__(self):
@@ -201,6 +221,7 @@ class STM32303C_EVAL_Driver(STM32_EVAL_Driver):
 class STM32373C_EVAL_Driver(STM32_EVAL_Driver):
     NAME = 'STM32373C_EVAL'
 
+
 # STemWin
 # NOTE: symbolic link libSTemWin_CMX_GCC.a needs to be created manually
 class STemWin(Driver):
@@ -216,6 +237,10 @@ class STemWin(Driver):
 
 
     
+
+#############################################################################
+# CHIPS BELOW
+#############################################################################
 
 class Stm32M0(CortexM0):
     def __init__( self, drivers=None ):
@@ -238,14 +263,12 @@ class Stm32M7(CortexM7):
         self.appendDrivers( drivers )
 
 
-
 # STM32F0xx
 class Stm32f0(Stm32M0):
     def __init__(self):
         Stm32M0.__init__( self, drivers=[
             STM32F0XX_StartupDriver(self.cpu),
             STM32F0XX_StdPeripheralDriver() ] )
-
 
 class Stm32f030xx(Stm32f0):
     cpu = 'STM32F030'
@@ -279,6 +302,7 @@ class Stm32f1hd(Stm32f1):
 class Stm32f1hdvl(Stm32f1):
     density = 'hd_vl'
 
+
 # STM32L1xx
 class Stm32l1(Stm32M3):
     def __init__(self):
@@ -309,20 +333,21 @@ class Stm32f2(Stm32M3):
 
 # STM32F4xx
 class Stm32f4(Stm32M4):
-    def __init__(self, use_hal_driver=False):
-        if use_hal_driver:
-            Stm32M4.__init__( self, drivers=[
-                STM32F4XX_StartupDriver(self.cpu),
-                STM32F4XX_HAL_Driver() ] )
+    def __init__(self, driver_type='std'):
+        if driver_type == 'll':
+            drivers = [ STM32F4XX_StartupDriver(self.cpu),
+                        STM32F4XX_LL_Driver() ]
+        elif driver_type == 'hal':
+            drivers = [ STM32F4XX_StartupDriver(self.cpu),
+                        STM32F4XX_HAL_Driver() ]
         else:
-            Stm32M4.__init__( self, drivers=[
-                STM32F4XX_LegacyStartupDriver(self.cpu_group),
-                STM32F4XX_StdPeripheralDriver() ] )
+            drivers = [ STM32F4XX_LegacyStartupDriver(self.cpu_group),
+                        STM32F4XX_StdPeripheralDriver() ]
+        Stm32M4.__init__( self, drivers=drivers )
 
 class Stm32f407xx(Stm32f4):
     cpu = 'STM32F407xx'
     cpu_group = 'STM32F40_41xxx'
-
 
 class Stm32f429xx(Stm32f4):
     cpu = 'STM32F429xx'
@@ -331,7 +356,7 @@ class Stm32f429xx(Stm32f4):
 
 # STM32F7xx
 class Stm32f7(Stm32M7):
-    def __init__(self):
+    def __init__(self, driver_type='hal'):
         Stm32M7.__init__( self, drivers=[
             STM32F7XX_StartupDriver(self.cpu),
             STM32F7XX_StdPeripheralDriver() ] )
