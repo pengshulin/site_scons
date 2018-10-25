@@ -63,9 +63,12 @@ class CortexM4(Cortex):
     freertos_port = 'ARM_CM4F'
 
 class CortexM7(Cortex):
-    _MCPU = 'cortex-m7'
+    _MCPU = 'cortex-m4'
+    #_MCPU = 'cortex-m7'
     _EXTRA_CCFLAGS = ['-DCORTEX_M7', '-DCORE_M7', '-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
+    #_EXTRA_CCFLAGS = ['-DCORTEX_M7', '-DCORE_M7', '-mfloat-abi=hard', '-mfpu=fpv5-sp-d16']
     _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
+    #_EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv5-sp-d16']
     freertos_port = 'ARM_CM7'
 
 # CMSIS-DSP driver

@@ -114,45 +114,47 @@ class STM32F4XX_StdPeripheralDriver(Driver):
     CFLAG = ['-DUSE_STDPERIPH_DRIVER']
 
 
-# HAL Driver
+# HAL/LL Driver
 class STM32F1XX_HAL_Driver(Driver):
     PATH = ['/ST/STM32F1xx_HAL_Driver/Inc']
-    GLOBSOURCE = ['/ST/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal*.c']
+    GLOBSOURCE = ['/ST/STM32F1xx_HAL_Driver/Src/stm32f1xx_*.c']
     GLOBSOURCE_EX = ['/ST/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_*template.c']
-    CFLAG = ['-DUSE_HAL_DRIVER']
+    CFLAG = ['-DUSE_HAL_DRIVER', '-DUSE_FULL_LL_DRIVER']
 
 class STM32F4XX_HAL_Driver(Driver):
     PATH = ['/ST/STM32F4xx_HAL_Driver/Inc']
-    GLOBSOURCE = ['/ST/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal*.c']
+    GLOBSOURCE = ['/ST/STM32F4xx_HAL_Driver/Src/stm32f4xx_*.c']
     GLOBSOURCE_EX = ['/ST/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_*template.c']
-    CFLAG = ['-DUSE_HAL_DRIVER']
+    CFLAG = ['-DUSE_HAL_DRIVER', '-DUSE_FULL_LL_DRIVER']
 
 class STM32F7XX_HAL_Driver(Driver):
     PATH = ['/ST/STM32F7xx_HAL_Driver/Inc']
-    GLOBSOURCE = ['/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_*.c']
-    CFLAG = ['-DUSE_HAL_DRIVER']
+    GLOBSOURCE = ['/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_*.c']
+    GLOBSOURCE_EX = ['/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_*template.c']
+    CFLAG = ['-DUSE_HAL_DRIVER', '-DUSE_FULL_LL_DRIVER']
 
 
-# LL Driver
+# LL-only Driver
 class STM32F1XX_LL_Driver(Driver):
     PATH = ['/ST/STM32F1xx_HAL_Driver/Inc']
-    GLOBSOURCE = ['/ST/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll*.c']
-    GLOBSOURCE_EX = ['/ST/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_*template.c']
-    CFLAG = ['-DUSE_HAL_DRIVER']
+    GLOBSOURCE = ['/ST/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll*.c',
+                  '/ST/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c',
+                  ]
+    CFLAG = ['-DUSE_FULL_LL_DRIVER']
 
 class STM32F4XX_LL_Driver(Driver):
     PATH = ['/ST/STM32F4xx_HAL_Driver/Inc']
-    GLOBSOURCE = ['/ST/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll*.c']
-    GLOBSOURCE_EX = ['/ST/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_*template.c']
-    CFLAG = ['-DUSE_HAL_DRIVER']
+    GLOBSOURCE = ['/ST/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll*.c',
+                  '/ST/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c',
+                 ]
+    CFLAG = ['-DUSE_FULL_LL_DRIVER']
 
 class STM32F7XX_LL_Driver(Driver):
     PATH = ['/ST/STM32F7xx_HAL_Driver/Inc']
-    GLOBSOURCE = ['/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_*.c']
-    GLOBSOURCE_EX = ['/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_*template.c']
-    CFLAG = ['-DUSE_HAL_DRIVER']
-
-
+    GLOBSOURCE = ['/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_*.c',
+                  '/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.c', 
+                 ]
+    CFLAG = ['-DUSE_FULL_LL_DRIVER']
 
 
 # USB Full Speed driver
@@ -333,11 +335,8 @@ class Stm32f2(Stm32M3):
 
 # STM32F4xx
 class Stm32f4(Stm32M4):
-    def __init__(self, driver_type='std'):
-        if driver_type == 'll':
-            drivers = [ STM32F4XX_StartupDriver(self.cpu),
-                        STM32F4XX_LL_Driver() ]
-        elif driver_type == 'hal':
+    def __init__(self, use_hal_driver=False):
+        if use_hal_driver:
             drivers = [ STM32F4XX_StartupDriver(self.cpu),
                         STM32F4XX_HAL_Driver() ]
         else:
@@ -356,10 +355,11 @@ class Stm32f429xx(Stm32f4):
 
 # STM32F7xx
 class Stm32f7(Stm32M7):
-    def __init__(self, driver_type='hal'):
-        Stm32M7.__init__( self, drivers=[
-            STM32F7XX_StartupDriver(self.cpu),
-            STM32F7XX_StdPeripheralDriver() ] )
+    def __init__(self):
+        drivers = [ STM32F7XX_StartupDriver(self.cpu),
+                        STM32F7XX_HAL_Driver() ]
+        Stm32M7.__init__( self, drivers=drivers )
+
 
 class Stm32f767xx(Stm32f7):
     cpu = 'STM32F767xx'
