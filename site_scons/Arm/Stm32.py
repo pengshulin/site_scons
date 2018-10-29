@@ -281,10 +281,15 @@ class Stm32f042xx(Stm32f0):
 
 # STM32F10x
 class Stm32f1(Stm32M3):
-    def __init__(self):
-        Stm32M3.__init__( self, drivers=[
-            STM32F10X_StartupDriver(self.density),
-            STM32F10X_StdPeripheralDriver() ] )
+    def __init__(self, use_hal_driver=False):
+        if use_hal_driver:
+            drivers = [ STM32F10X_StartupDriver(self.density),
+                        STM32F1XX_HAL_Driver() ]
+        else:
+            drivers = [ STM32F10X_StartupDriver(self.density),
+                        STM32F10X_StdPeripheralDriver() ]
+        Stm32M3.__init__( self, drivers=drivers )
+
 
 class Stm32f1xld(Stm32f1):
     density = 'ld'
@@ -327,10 +332,15 @@ class Stm32l1xl(Stm32l1):
 
 # STM32F2xx
 class Stm32f2(Stm32M3):
-    def __init__(self):
-         Stm32M3.__init__( self, drivers=[
-            STM32F2XX_StartupDriver(),
-            STM32F2XX_StdPeripheralDriver() ] )
+    def __init__(self, use_hal_driver=False):
+        if use_hal_driver:
+            drivers = [ STM32F2XX_StartupDriver(),
+                        STM32F2XX__HAL_Driver() ]
+        else:
+            drivers = [ STM32F2XX_StartupDriver(),
+                        STM32F2XX_StdPeripheralDriver() ]
+        Stm32M3.__init__( self, drivers=drivers )
+
 
 
 # STM32F4xx

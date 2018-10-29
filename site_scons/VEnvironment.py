@@ -51,6 +51,7 @@ class VEnvironment(Environment):
     # default flags
     _DEF_CCFLAGS = ['-Wno-unused-but-set-variable', '-Wall',
                     #'-pedantic',
+                    '-fno-strict-aliasing',
                     '-ffunction-sections', '-fdata-sections']
     _DEF_CPPPATH = []
     _DEF_LIBPATH = []
