@@ -37,6 +37,21 @@ class STM32F10X_StartupDriver(Driver):
         self.CFLAG = ['-DSTM32F10X_%s'% density.upper()]
         self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
+class STM32F1XX_StartupDriver(Driver):
+    PATH = ['/CMSIS/Device/ST/STM32F1xx/Include']
+    def __init__(self, cpu_group):
+        assert cpu_group in [
+            'STM32F100xB', 'STM32F100xE', 'STM32F101x6', 'STM32F101xB',
+            'STM32F101xE', 'STM32F101xG', 'STM32F102x6', 'STM32F102xB',
+            'STM32F103x6', 'STM32F103xB', 'STM32F103xE', 'STM32F103xG',
+            'STM32F105xC', 'STM32F107xC' ]
+        self.SOURCE = [
+            '/CMSIS/Device/ST/STM32F1xx/Source/Templates/gcc/startup_%s.s'% cpu_group.lower(), 
+            '/CMSIS/Device/ST/STM32F1xx/Source/Templates/system_stm32f1xx.c' ]
+        self.CFLAG = ['-D%s'% cpu_group]
+        self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
+
+
 class STM32L1XX_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32L1xx/Include']
     def __init__(self, density):
@@ -283,7 +298,7 @@ class Stm32f042xx(Stm32f0):
 class Stm32f1(Stm32M3):
     def __init__(self, use_hal_driver=False):
         if use_hal_driver:
-            drivers = [ STM32F10X_StartupDriver(self.density),
+            drivers = [ STM32F1XX_StartupDriver(self.cpu_group),
                         STM32F1XX_HAL_Driver() ]
         else:
             drivers = [ STM32F10X_StartupDriver(self.density),
@@ -309,7 +324,15 @@ class Stm32f1hd(Stm32f1):
 class Stm32f1hdvl(Stm32f1):
     density = 'hd_vl'
 
-
+class Stm32f103xb(Stm32f1):
+    density = 'md'
+    cpu_group = 'STM32F103xB'
+ 
+class Stm32f103xe(Stm32f1):
+    density = 'hd'
+    cpu_group = 'STM32F103xE'
+ 
+ 
 # STM32L1xx
 class Stm32l1(Stm32M3):
     def __init__(self):
