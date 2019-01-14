@@ -56,7 +56,7 @@ class VEnvironment(Environment):
     _DEF_CPPPATH = []
     _DEF_LIBPATH = []
     _DEF_LIBS = ['m']
-    _DEF_LINKFLAGS = ['-Wl,--gc-sections']
+    _DEF_LINKFLAGS = ['-Wl,--gc-sections', '-Wl,--cref']
 
     # additional flags
     _CCFLAGS = []
