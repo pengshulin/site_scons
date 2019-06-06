@@ -335,18 +335,16 @@ class VEnvironment(Environment):
                     #self.AddPreAction(obj, self.splint_cmd)
                     self.AddPostAction(obj, self.splint_cmd)
          
-        elffile = self.Program( name + '.elf', objs )
-        #elffile = self.Program( name + '.elf', self.source )
-        binfile = self.Bin( name + '.bin', elffile )
-        hexfile = self.Hex( name + '.hex', elffile )
-        lstfile = self.Dump( name + '.lst', elffile )
-        #mapfile = self.Map( name + '.map', elffile )
-        self.Depends( binfile, elffile )
-        self.Depends( hexfile, elffile )
-        self.Depends( lstfile, elffile )
-        #self.Depends( mapfile, elffile )
-        self.Size( source=elffile )
-        # TODO: add obj dumper if needed
+        self.elffile = self.Program( name + '.elf', objs )
+        self.binfile = self.Bin( name + '.bin', self.elffile )
+        self.hexfile = self.Hex( name + '.hex', self.elffile )
+        self.lstfile = self.Dump( name + '.lst', self.elffile )
+        #self.mapfile = self.Map( name + '.map', self.elffile )
+        self.Depends( self.binfile, self.elffile )
+        self.Depends( self.hexfile, self.elffile )
+        self.Depends( self.lstfile, self.elffile )
+        #self.Depends( self.mapfile, self.elffile )
+        self.Size( source=self.elffile )
 
     def makeLib( self, name=None ):
         self.prepareLintEnv()
