@@ -1,12 +1,12 @@
-'''Virtual Environment'''
-# mcu build scripts based on scons, designed by PengShulin 
-# Peng Shulin <trees_peng@163.com> 2018
+# MCUSH Scons Build Scripts, designed by Peng Shulin 
 from SCons.Builder import Builder
 from SCons.Action import Action
 from SCons.Environment import Environment
 from SCons.Errors import StopError
 
-from Toolchain import Gcc
+from Toolchain import *
+from Utils import *
+import Utils
 
 from os import environ, getenv, getcwd, system
 from os.path import basename, abspath, isfile, join, splitext, dirname
@@ -16,10 +16,6 @@ from sys import path as sys_path
 import sys
 from subprocess import check_output
 
-_SWITCH_CONFIRM = ['1', 'Y', 'y', 'T', 't', 'yes', 'Yes', 'YES', 'true', 'True', 'TRUE']
-
-def getBoolEnv( name ):
-    return bool( getenv(name) in _SWITCH_CONFIRM )
 
 def _findRoot(relative=False):
     _dir = abspath(getcwd())
@@ -56,7 +52,9 @@ class VEnvironment(Environment):
     _DEF_CPPPATH = []
     _DEF_LIBPATH = []
     _DEF_LIBS = ['m']
-    _DEF_LINKFLAGS = ['-Wl,--gc-sections', '-Wl,--cref']
+    _DEF_LINKFLAGS = ['-Wl,--gc-sections',
+                      '-Wl,--print-memory-usage',
+                      '-Wl,--cref']
 
     # additional flags
     _CCFLAGS = []
@@ -89,14 +87,10 @@ class VEnvironment(Environment):
     def getBoolEnv( self, name ):
         return getBoolEnv( name )
     
-    def _initBuildDate( self ):
-        self.BUILD_DATE = strftime("%y-%m-%d %H:%M:%S")
-
     def __init__( self ):
         Environment.__init__( self, ENV=environ )
 
         self._initFromSysEnv()
-        self._initBuildDate()
 
         tool = self._TOOLCHAIN()
         self['AR'] = tool.AR
@@ -157,7 +151,6 @@ class VEnvironment(Environment):
         assert isinstance(flag, list) 
         self.Append( CCFLAGS=flag )
     
-
     def appendLinkFlag( self, flag ):
         assert isinstance(flag, list) 
         self.Append( LINKFLAGS=flag )
@@ -308,6 +301,8 @@ class VEnvironment(Environment):
 
     def makeApp( self, name=None ):
         '''make application'''
+        generateBuildSignatureFile()
+
         self.prepareLintEnv()
         try:
             self._optimize_flags_added
@@ -392,7 +387,7 @@ class VEnvironment(Environment):
     def appendOptimizeFlags( self, optimize_flags=None, define_flags=None ):
         if optimize_flags is None:
             if self.DEBUG:
-                optimize_flags = ['-g', '-O0']
+                optimize_flags = ['-g', '-O0', '-Werror']
             else:
                 optimize_flags = ['-g', '-O3', '-Werror']
         self.appendCompilerFlag(optimize_flags)
@@ -428,6 +423,7 @@ class VEnvironment(Environment):
     def resetSources( self ):
         self.source = []
 
+    # name aliases for mistype
     appendPaths = appendPath
     appendGlobSources = appendGlobSource
     appendSources = appendSource

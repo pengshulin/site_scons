@@ -1,5 +1,9 @@
-This is my scons build scripts for embedded processors
-try ./install to make symbolic links to ~/.scons
+This is my scons build scripts for embedded processors.
+Although it's especially designed for MCUSH project,
+they are still organized as two independent repositories, 
+so commericial customers can download this toolkit quickly
+and don't need to download the whole MCUSH repository.
+
 
 current supports:
 * STM32F1
@@ -10,8 +14,8 @@ current supports:
 * ATMEGA128
  
 
+try ./install to make symbolic links to ~/.scons
 
 
-
-Shulin Peng <trees_peng@163.com>
+Shulin Peng <trees_peng@163.com> 2019
 

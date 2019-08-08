@@ -1,6 +1,5 @@
-'''toolchain defination'''
-# mcu build scripts based on scons, designed by PengShulin 
-# Peng Shulin <trees_peng@163.com> 2018
+# MCUSH Scons Build Scripts, designed by Peng Shulin 
+
 
 class Gcc():
     '''base toochain'''
