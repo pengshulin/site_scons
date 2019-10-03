@@ -357,32 +357,56 @@ class VEnvironment(Environment):
         libfile = self.Library( name, objs )
         self.Size( source=libfile )
 
-    def makeMDPDF( self, fname ):
+    def makeMarkdownPdf( self, fname ):
         try:
-            self.builder_pdf
+            self.builder_md_pdf
         except AttributeError:
-            self.builder_pdf = Builder(action='markdown2pdf $SOURCES $TARGET',
-                       suffix='.pdf', src_suffix='.md' )
-            self.Append(BUILDERS = {'MDPDF': self.builder_pdf})
+            self.builder_md_pdf = Builder(
+                    action='markdown2pdf $SOURCES $TARGET',
+                    suffix='.pdf', src_suffix='.md' )
+            self.Append(BUILDERS = {'MarkdownPdf': self.builder_md_pdf})
         base = splitext(fname)[0]
-        self.MDPDF( target='%s.pdf'% base, source='%s.md'% base )
+        self.mdpdffile = self.MarkdownPdf(
+                    target='%s.pdf'% base, source='%s.md'% base )
 
-    def makeMDLandSlide( self, fname, pdf_mode=False ):
+    def makeMarkdownHtml( self, fname ):
         try:
-            self.builder_landslide_html
+            self.builder_md_html
         except AttributeError:
-            self.builder_landslide_html = Builder(action='landslide $SOURCES -d $TARGET',
-                       suffix='.html', src_suffix='.md' )
-            self.builder_landslide_pdf = Builder(action='landslide $SOURCES -d $TARGET',
-                       suffix='.pdf', src_suffix='.md' )
-            self.Append(BUILDERS = {'MDLandSlideHTML': self.builder_landslide_html})
-            self.Append(BUILDERS = {'MDLandSlidePDF': self.builder_landslide_pdf})
+            self.builder_md_html = Builder(
+                    action='markdown $SOURCES >> $TARGET',
+                    suffix='.pdf', src_suffix='.html' )
+            self.Append(BUILDERS = {'MarkdownHtml': self.builder_md_html})
         base = splitext(fname)[0]
-        if pdf_mode:
-            self.MDLandSlidePDF( target='%s.pdf'% base, source='%s.md'% base )
-        else:
-            self.MDLandSlideHTML( target='%s.html'% base, source='%s.md'% base )
+        self.mdhtmlfile = self.MarkdownHtml(
+                    target='%s.html'% base, source='%s.md'% base )
+        self.AddPostAction( self.mdhtmlfile, Action(
+            'mv %s.html .html && \
+             echo "<meta charset=utf8>" > .charset && \
+             cat .charset .html > %s.html && \
+             rm -f .charset .html'% (base, base)) )
 
+    def makeMarkdownLandSlidePdf( self, fname ):
+        try:
+            self.builder_md_landslide_pdf
+        except AttributeError:
+            self.builder_md_landslide_pdf = Builder(
+                    action='landslide $SOURCES -d $TARGET',
+                    suffix='.pdf', src_suffix='.md' )
+            self.Append(BUILDERS = {'MarkdownLandSlidePdf': self.builder_md_landslide_pdf})
+        base = splitext(fname)[0]
+        self.MarkdownLandSlidePdf( target='%s.pdf'% base, source='%s.md'% base )
+
+    def makeMarkdownLandSlideHtml( self, fname ):
+        try:
+            self.builder_md_landslide_html
+        except AttributeError:
+            self.builder_md_landslide_html = Builder(
+                    action='landslide $SOURCES -d $TARGET',
+                    suffix='.html', src_suffix='.md' )
+            self.Append(BUILDERS = {'MarkdownLandSlideHtml': self.builder_md_landslide_html})
+        base = splitext(fname)[0]
+        self.MarkdownLandSlideHtml( target='%s.html'% base, source='%s.md'% base )
 
     def appendOptimizeFlags( self, optimize_flags=None, define_flags=None ):
         if optimize_flags is None:
