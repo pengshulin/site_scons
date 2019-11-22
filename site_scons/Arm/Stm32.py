@@ -376,6 +376,19 @@ class Stm32f4(Stm32M4):
                         STM32F4XX_StdPeripheralDriver() ]
         Stm32M4.__init__( self, drivers=drivers )
 
+
+class Stm32f401xc(Stm32f4):
+    cpu = 'STM32F401xC'
+    cpu_group = 'STM32F40_41xxx'
+
+class Stm32f401xe(Stm32f4):
+    cpu = 'STM32F401xE'
+    cpu_group = 'STM32F40_41xxx'
+
+class Stm32f411xe(Stm32f4):
+    cpu = 'STM32F411xE'
+    cpu_group = 'STM32F40_41xxx'
+
 class Stm32f407xx(Stm32f4):
     cpu = 'STM32F407xx'
     cpu_group = 'STM32F40_41xxx'
