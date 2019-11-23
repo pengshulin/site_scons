@@ -509,10 +509,10 @@ class config():
     append_freertos = True
     use_vfs = True
     use_romfs = True
-    use_fcfs = False
-    use_spiffs = False
-    use_fatfs = False
-    use_eth = False
+    use_fcfs = None
+    use_spiffs = None
+    use_fatfs = None
+    use_eth = None
 
     def __getattr__( self, key ):
         if self.__dict__.has_key( key ):
@@ -563,12 +563,12 @@ def loadHalConfig( haldir, *args, **kwargs ):
     if hal_config.append_freertos:
         config.env.appendFreertos()
     # apply vfs related
-    config.env.appendDefineFlags( [ 'MCUSH_VFS=%d'% int(hal_config.use_vfs) ] )
+    config.env.appendDefineFlags( [ 'MCUSH_VFS=%d'% int(bool(hal_config.use_vfs)) ] )
     if hal_config.use_vfs:
-        config.env.appendDefineFlags( [ 'MCUSH_ROMFS=%d'% int(hal_config.use_romfs) ] )
-        config.env.appendDefineFlags( [ 'MCUSH_FCFS=%d'% int(hal_config.use_fcfs) ] )
-        config.env.appendDefineFlags( [ 'MCUSH_SPIFFS=%d'% int(hal_config.use_spiffs) ] )
-        config.env.appendDefineFlags( [ 'MCUSH_FATFS=%d'% int(hal_config.use_fatfs) ] )
+        config.env.appendDefineFlags( [ 'MCUSH_ROMFS=%d'% int(bool(hal_config.use_romfs)) ] )
+        config.env.appendDefineFlags( [ 'MCUSH_FCFS=%d'% int(bool(hal_config.use_fcfs)) ] )
+        config.env.appendDefineFlags( [ 'MCUSH_SPIFFS=%d'% int(bool(hal_config.use_spiffs)) ] )
+        config.env.appendDefineFlags( [ 'MCUSH_FATFS=%d'% int(bool(hal_config.use_fatfs)) ] )
         if hal_config.use_spiffs:
             config.env.appendSpiffs()
         if hal_config.use_fatfs:
