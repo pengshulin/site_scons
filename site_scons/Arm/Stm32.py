@@ -389,6 +389,10 @@ class Stm32f411xe(Stm32f4):
     cpu = 'STM32F411xE'
     cpu_group = 'STM32F40_41xxx'
 
+class Stm32f412rx(Stm32f4):
+    cpu = 'STM32F412Rx'
+    cpu_group = 'STM32F40_41xxx'
+
 class Stm32f407xx(Stm32f4):
     cpu = 'STM32F407xx'
     cpu_group = 'STM32F40_41xxx'
