@@ -88,7 +88,8 @@ class CMSIS_DSP_Driver(Driver):
         elif cpu == 'cortex-m7':
             self.CFLAG = ['-DARM_MATH_CM7']
         if fpu:
-            self.CFLAG += ['-D__VFP_FP__', '-D__FPU_PRESENT']
+            #self.CFLAG += ['-D__VFP_FP__', '-D__FPU_PRESENT']
+            self.CFLAG += ['-D__VFP_FP__']
         if source:
             self.GLOBSOURCE = [
                 '/CMSIS/DSP_Lib/Source/BasicMathFunctions/*.c',

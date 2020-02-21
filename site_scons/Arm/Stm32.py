@@ -29,7 +29,7 @@ class STM32F0XX_StartupDriver(Driver):
 class STM32F10X_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32F10x/Include']
     def __init__(self, density):
-        assert density in ['md', 'hd', 'ld', 'ld_vl']
+        assert density in ['ld', 'ld_vl', 'md', 'md_vl', 'hd', 'hd_vl', 'xl', 'cl']
         self.SOURCE = [
             '/CMSIS/Device/ST/STM32F10x/Source/Templates/gcc_ride7/startup_stm32f10x_%s.s'% density, 
             '/CMSIS/Device/ST/STM32F10x/Source/Templates/system_stm32f10x.c' ]
@@ -304,32 +304,61 @@ class Stm32f1(Stm32M3):
                         STM32F10X_StdPeripheralDriver() ]
         Stm32M3.__init__( self, drivers=drivers )
 
-
-class Stm32f1xld(Stm32f1):
+# - Low-density devices are STM32F101xx, STM32F102xx and STM32F103xx microcontrollers
+#   where the Flash memory density ranges between 16 and 32 Kbytes.
+# - Low-density value line devices are STM32F100xx microcontrollers where the Flash
+#   memory density ranges between 16 and 32 Kbytes.
+# - Medium-density devices are STM32F101xx, STM32F102xx and STM32F103xx microcontrollers
+#   where the Flash memory density ranges between 64 and 128 Kbytes.
+# - Medium-density value line devices are STM32F100xx microcontrollers where the 
+#   Flash memory density ranges between 64 and 128 Kbytes.   
+# - High-density devices are STM32F101xx and STM32F103xx microcontrollers where
+#   the Flash memory density ranges between 256 and 512 Kbytes.
+# - High-density value line devices are STM32F100xx microcontrollers where the 
+#   Flash memory density ranges between 256 and 512 Kbytes.   
+# - XL-density devices are STM32F101xx and STM32F103xx microcontrollers where
+#   the Flash memory density ranges between 512 and 1024 Kbytes.
+# - Connectivity line devices are STM32F105xx and STM32F107xx microcontrollers.
+class Stm32f1ld(Stm32f1):
     density = 'ld'
-                
-class Stm32f1xldvl(Stm32f1):
+class Stm32f1ldvl(Stm32f1):
     density = 'ld_vl'
- 
 class Stm32f1md(Stm32f1):
     density = 'md'
-
 class Stm32f1mdvl(Stm32f1):
     density = 'md_vl'
-
 class Stm32f1hd(Stm32f1):
     density = 'hd'
-
 class Stm32f1hdvl(Stm32f1):
     density = 'hd_vl'
-
-class Stm32f103xb(Stm32f1):
-    density = 'md'
-    cpu_group = 'STM32F103xB'
+class Stm32f1xl(Stm32f1):
+    density = 'xl'
+class Stm32f1cl(Stm32f1):
+    density = 'cl'
  
-class Stm32f103xe(Stm32f1):
-    density = 'hd'
+# chips
+class Stm32f103x4(Stm32f1ld):
+    cpu_group = 'STM32F103x4'
+class Stm32f103x6(Stm32f1ld):
+    cpu_group = 'STM32F103x6'
+class Stm32f103x8(Stm32f1md):
+    cpu_group = 'STM32F103x8'
+class Stm32f103xb(Stm32f1md):
+    cpu_group = 'STM32F103xB'
+class Stm32f103xc(Stm32f1hd):
+    cpu_group = 'STM32F103xC'
+class Stm32f103xd(Stm32f1hd):
+    cpu_group = 'STM32F103xD'
+class Stm32f103xe(Stm32f1hd):
     cpu_group = 'STM32F103xE'
+class Stm32f103xf(Stm32f1xl):
+    cpu_group = 'STM32F103xF'
+class Stm32f103xg(Stm32f1xl):
+    cpu_group = 'STM32F103xG'
+class Stm32f105xx(Stm32f1cl):
+    cpu_group = 'STM32F105xx'
+class Stm32f107xx(Stm32f1cl):
+    cpu_group = 'STM32F107xx'
  
  
 # STM32L1xx
