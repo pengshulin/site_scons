@@ -3,6 +3,7 @@ from SCons.Builder import Builder
 from SCons.Action import Action
 from SCons.Environment import Environment
 from SCons.Errors import StopError
+from SCons.Script import GetOption
 
 from Toolchain import *
 from Utils import *
@@ -41,6 +42,7 @@ class VEnvironment(Environment):
     source = []
     root = None
     linkfile = None
+    name = None
 
     _TOOLCHAIN = Gcc
 
@@ -228,9 +230,15 @@ class VEnvironment(Environment):
 
     def findRoot( self ):
         self.root = _findRoot()
-        print( 'scons: root ' + self.root )
+        if not GetOption('silent'):
+            print( 'scons: root=' + self.root )
         
+    def setName( self, name ):
+        self.name = name
+
     def getName( self ):
+        if self.name:
+            return self.name
         dirname = basename(getcwd())
         if dirname.startswith('app'):
             name = dirname[3:]
@@ -340,6 +348,9 @@ class VEnvironment(Environment):
         self.Depends( self.lstfile, self.elffile )
         #self.Depends( self.mapfile, self.elffile )
         self.Size( source=self.elffile )
+        # append name target
+        pathname = join(getcwd(), basename(name))
+        self.AlwaysBuild( self.Alias('name', [], 'echo %s'% pathname) )
 
     def makeLib( self, name=None ):
         self.prepareLintEnv()
@@ -547,10 +558,11 @@ def loadHalConfig( haldir, *args, **kwargs ):
     for k,v in kwargs.items():
         hal_config.__dict__[k] = v
     # print to console
-    if hal_config.__dict__:
-        print( 'scons: hal_config %s'% (','.join(['%s=%s'% (str(k),str(v)) for k,v in hal_config.__dict__.items()])) )
-    else:
-        print( 'scons: hal_config default' )
+    if not GetOption('silent'):
+        if hal_config.__dict__:
+            print( 'scons: hal_config(%s)'% (', '.join(['%s=%s'% (str(k),str(v)) for k,v in hal_config.__dict__.items()])) )
+        else:
+            print( 'scons: hal_config()' )
     # load from config.py
     import config as config
     config.env.haldir = haldir

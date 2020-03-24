@@ -28,11 +28,11 @@ class STM32F0XX_StartupDriver(Driver):
 
 class STM32F10X_StartupDriver(Driver):
     PATH = ['/CMSIS/Device/ST/STM32F10x/Include']
-    def __init__(self, density):
+    def __init__(self, density, include_system=True):
         assert density in ['ld', 'ld_vl', 'md', 'md_vl', 'hd', 'hd_vl', 'xl', 'cl']
-        self.SOURCE = [
-            '/CMSIS/Device/ST/STM32F10x/Source/Templates/gcc_ride7/startup_stm32f10x_%s.s'% density, 
-            '/CMSIS/Device/ST/STM32F10x/Source/Templates/system_stm32f10x.c' ]
+        self.SOURCE = [ '/CMSIS/Device/ST/STM32F10x/Source/Templates/gcc_ride7/startup_stm32f10x_%s.s'% density ]
+        if include_system:
+            self.SOURCE.append( '/CMSIS/Device/ST/STM32F10x/Source/Templates/system_stm32f10x.c' )
         self.CFLAG = ['-DSTM32F10X_%s'% density.upper()]
         self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
