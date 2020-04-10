@@ -494,9 +494,12 @@ class VEnvironment(Environment):
             ] )
         self.appendGlobSource( [
             '/libFreeRTOS/*.c',
-            '/libFreeRTOS/portable/MemMang/heap_%d.c'% heap,
             '/libFreeRTOS/portable/GCC/%s/port.c'% self.freertos_port,
             ] )
+        if isinstance(heap, int):
+            self.appendGlobSource( [
+                '/libFreeRTOS/portable/MemMang/heap_%d.c'% heap,
+                ] )
     
     def appendHal( self, haldir, paths=None, sources=None ):
         self.appendPath( ['/hal%s'% haldir] )
@@ -573,7 +576,10 @@ def loadHalConfig( haldir, *args, **kwargs ):
     if hal_config.append_mcush:
         config.env.appendMcush()
     if hal_config.append_freertos:
-        config.env.appendFreertos()
+        if hal_config.freertos_heap is None:
+            config.env.appendFreertos()
+        else:
+            config.env.appendFreertos(heap=hal_config.freertos_heap)
     # apply vfs related
     config.env.appendDefineFlags( [ 'MCUSH_VFS=%d'% int(bool(hal_config.use_vfs)) ] )
     if hal_config.use_vfs:
