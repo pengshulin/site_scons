@@ -437,7 +437,27 @@ class VEnvironment(Environment):
     def appendDefineFlags( self, define_flags=None ):
         if define_flags is None:
             return
-        self.appendCompilerFlag(['-D%s'% d for d in define_flags])
+        transferd_flags = []
+        for d in define_flags:
+            t = []
+            for c in d:
+                if c == '\\':
+                    t.append('\\\\')
+                elif c == '\'':
+                    t.append('\\\'')
+                elif c == '\"':
+                    t.append('\\\"')
+                elif 33 <= ord(c) <= 126:
+                    # all other printable chars except space
+                    t.append(c)
+                else:
+                    t.append('\\x%02X'% ord(c))
+            #print( "TRANSFER: " + d + ' --> ' + hexlify(''.join(t)) )
+            transferd_flags.append( ''.join(t) )
+        #print( transferd_flags )
+        self.appendCompilerFlag(['-D'+d for d in transferd_flags])
+
+
 
     def appendDriver( self, d ):
         if isinstance(d, Driver):
