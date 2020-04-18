@@ -439,21 +439,27 @@ class VEnvironment(Environment):
             return
         transferd_flags = []
         for d in define_flags:
+            quoting_mode = False
+            hex_mode = False
             t = []
             for c in d:
                 if c == '\\':
                     t.append('\\\\')
                 elif c == '\'':
                     t.append('\\\'')
+                    quoted_mode = True
                 elif c == '\"':
                     t.append('\\\"')
-                elif 33 <= ord(c) <= 126:
+                    quoted_mode = True
+                elif (not quoting_mode) and (not hex_mode) and (33 <= ord(c) <= 126):
                     # all other printable chars except space
                     t.append(c)
                 else:
-                    t.append('\\x%02X'% ord(c))
-            #print( "TRANSFER: " + d + ' --> ' + hexlify(''.join(t)) )
-            transferd_flags.append( ''.join(t) )
+                    t.append('\\\\x%X'% ord(c))
+                    hex_mode = True
+            t = ''.join(t)
+            #print( "TRANSFER: " + d + ' --> ' + t + ' (' +  hexlify(t) + ')' )
+            transferd_flags.append( t )
         #print( transferd_flags )
         self.appendCompilerFlag(['-D'+d for d in transferd_flags])
 
