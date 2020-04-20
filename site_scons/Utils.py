@@ -23,3 +23,8 @@ def char2wchar(char):
 def chars2wchars(chars):
     return ''.join(map(char2wchar, chars))
 
+def getStringDescriptor(desc):
+    wdesc = chars2wchars(desc)
+    return chr(len(wdesc)+2) + chr(3) + wdesc
+
+

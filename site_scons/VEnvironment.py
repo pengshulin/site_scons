@@ -442,15 +442,17 @@ class VEnvironment(Environment):
             quoting_mode = False
             hex_mode = False
             t = []
-            for c in d:
+            d_len = len(d)
+            for i, c in enumerate(d):
                 if c == '\\':
                     t.append('\\\\')
-                elif c == '\'':
-                    t.append('\\\'')
-                    quoted_mode = True
-                elif c == '\"':
-                    t.append('\\\"')
-                    quoted_mode = True
+                elif c in '\'\"':
+                    if (not quoting_mode) or (i==(d_len-1)):
+                        t.append('\\')
+                        t.append(c)
+                        quoting_mode = True
+                    else:
+                        t.append('\\\\x%X'% ord(c))
                 elif (not quoting_mode) and (not hex_mode) and (33 <= ord(c) <= 126):
                     # all other printable chars except space
                     t.append(c)
