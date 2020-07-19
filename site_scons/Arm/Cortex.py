@@ -4,6 +4,7 @@ from Toolchain import Gcc
 from VEnvironment import VEnvironment, Driver, hal_config
 
 class ArmNoneEabiGcc(Gcc):
+    #PREFIX = '/usr/bin/arm-none-eabi-'
     PREFIX = 'arm-none-eabi-'
 
 
@@ -12,11 +13,13 @@ class Cortex(VEnvironment):
     '''base class for cortex'''
     _TOOLCHAIN = ArmNoneEabiGcc
     _MCPU = None
+    _ASFLAGS = []
     _CCFLAGS = []
     _CPPPATH = []
     _LIBPATH = []
     _LIBS = []
     _LINKFLAGS = []
+    _EXTRA_ASFLAGS = []
     _EXTRA_CCFLAGS = []
     _EXTRA_LINKFLAGS = []
 
@@ -29,10 +32,12 @@ class Cortex(VEnvironment):
         # NOTE: 
         # link flags must contain cpu/fpu configs same as compiler flags,
         # which will influence how the ld is called and which libs are used
+        self.appendAssemblerFlag( ['-mcpu=%s'%self._MCPU, '-mthumb'] )
         self.appendCompilerFlag( ['-mcpu=%s'%self._MCPU, '-mthumb'] )
         self.appendLinkFlag( ['-mcpu=%s'%self._MCPU, '-mthumb'] )
         if self.INCLUDE_CMSIS:
             self.appendPath( ['/CMSIS/Include'] )
+        self.appendAssemblerFlag(self._EXTRA_ASFLAGS)
         self.appendCompilerFlag(self._EXTRA_CCFLAGS)
         self.appendLinkFlag(self._EXTRA_LINKFLAGS)
         #self.appendLinkFlag(['-v'])  # to check how ld is called by gcc
@@ -42,33 +47,38 @@ class Cortex(VEnvironment):
 
 class CortexM0(Cortex):
     _MCPU = 'cortex-m0'
+    _EXTRA_ASFLAGS = ['-mfloat-abi=soft']
     _EXTRA_CCFLAGS = ['-DCORTEX_M0', '-DCORE_M0', '-mfloat-abi=soft']
     freertos_port = 'ARM_CM0'
+    rtx_irq_port = 'irq_cm0'
 
 class CortexM0plus(Cortex):
     _MCPU = 'cortex-m0plus'
     _EXTRA_CCFLAGS = ['-DCORTEX_M0', '-DCORE_M0', '-mfloat-abi=soft']
     freertos_port = 'ARM_CM0'
+    rtx_irq_port = 'irq_cm0'
 
 class CortexM3(Cortex):
     _MCPU = 'cortex-m3'
+    _EXTRA_ASFLAGS = ['-mfloat-abi=sort']
     _EXTRA_CCFLAGS = ['-DCORTEX_M3', '-DCORE_M3', '-mfloat-abi=soft']
     freertos_port = 'ARM_CM3'
+    rtx_irq_port = 'irq_cm3'
 
 class CortexM4(Cortex):
     _MCPU = 'cortex-m4'
+    _EXTRA_ASFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16' ]
     _EXTRA_CCFLAGS = ['-DCORTEX_M4', '-DCORE_M4', '-mfloat-abi=hard', '-mfpu=fpv4-sp-d16', ]
     _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16', ]
     freertos_port = 'ARM_CM4F'
+    rtx_irq_port = 'irq_cm4f'
 
 class CortexM7(Cortex):
-    _MCPU = 'cortex-m4'
-    #_MCPU = 'cortex-m7'
-    _EXTRA_CCFLAGS = ['-DCORTEX_M7', '-DCORE_M7', '-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
-    #_EXTRA_CCFLAGS = ['-DCORTEX_M7', '-DCORE_M7', '-mfloat-abi=hard', '-mfpu=fpv5-sp-d16']
-    _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
-    #_EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv5-sp-d16']
-    freertos_port = 'ARM_CM7'
+    _MCPU = 'cortex-m7'
+    _EXTRA_ASFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16' ]
+    _EXTRA_CCFLAGS = ['-DCORTEX_M7', '-DCORE_M7', '-mfloat-abi=hard', '-mfpu=fpv5-sp-d16']
+    _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv5-sp-d16']
+    freertos_port = 'ARM_CM7/r0p1'
 
 # CMSIS-DSP driver
 class CMSIS_DSP_Driver(Driver):

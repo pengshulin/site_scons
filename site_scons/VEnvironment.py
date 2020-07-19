@@ -47,8 +47,10 @@ class VEnvironment(Environment):
     _TOOLCHAIN = Gcc
 
     # default flags
+    _DEF_ASFLAGS = []
     _DEF_CCFLAGS = ['-Wno-unused-but-set-variable', '-Wall',
                     #'-pedantic',
+                    '-std=c99',
                     '-fno-strict-aliasing',
                     '-ffunction-sections', '-fdata-sections']
     _DEF_CPPPATH = []
@@ -59,6 +61,7 @@ class VEnvironment(Environment):
                       '-Wl,--cref']
 
     # additional flags
+    _ASFLAGS = []
     _CCFLAGS = []
     _CPPPATH = []
     _LIBPATH = []
@@ -105,12 +108,14 @@ class VEnvironment(Environment):
         self['OBJCOPY'] = tool.OBJCOPY
         self['OBJDUMP'] = tool.OBJDUMP
 
+        self.Append( ASFLAGS=self._DEF_ASFLAGS )
         self.Append( CCFLAGS=self._DEF_CCFLAGS )
         self.Append( CPPPATH=self._DEF_CPPPATH )
         self.Append( LIBS=self._DEF_LIBS )
         self.Append( LIBPATH=self._DEF_LIBPATH )
         self.Append( LINKFLAGS=self._DEF_LINKFLAGS )
 
+        self.Append( ASFLAGS=self._ASFLAGS )
         self.Append( CCFLAGS=self._CCFLAGS )
         self.Append( CPPPATH=self._CPPPATH )
         if self._LIBS:
@@ -149,6 +154,10 @@ class VEnvironment(Environment):
             #print( 'scons: cpu number %d'% cpus )
             self.SetOption('num_jobs', cpus)
 
+    def appendAssemblerFlag( self, flag ):
+        assert isinstance(flag, list) 
+        self.Append( ASFLAGS=flag )
+ 
     def appendCompilerFlag( self, flag ):
         assert isinstance(flag, list) 
         self.Append( CCFLAGS=flag )
@@ -425,6 +434,10 @@ class VEnvironment(Environment):
                 optimize_flags = ['-g', '-O0', '-Werror']
             else:
                 optimize_flags = ['-g', '-O3', '-Werror']
+            optimize_flags += [
+                '-Wno-error=attributes',
+                #'-Wno-error=stringop-truncation',
+                ]
         self.appendCompilerFlag(optimize_flags)
         self._optimize_flags_added = True
         if define_flags is None:
@@ -529,6 +542,15 @@ class VEnvironment(Environment):
                 '/libFreeRTOS/portable/MemMang/heap_%d.c'% heap,
                 ] )
     
+    def appendRTX( self ):
+        self.appendPath( [
+            '/libRTX',
+            ] )
+        self.appendGlobSource( [
+            '/libRTX/*.c',
+            '/libRTX/GCC/%s.s'% self.rtx_irq_port,
+            ] )
+      
     def appendHal( self, haldir, paths=None, sources=None ):
         self.appendPath( ['/hal%s'% haldir] )
         self.appendGlobSource( ['/hal%s/*.c'% haldir] )
