@@ -60,7 +60,7 @@ class CortexM0plus(Cortex):
 
 class CortexM3(Cortex):
     _MCPU = 'cortex-m3'
-    _EXTRA_ASFLAGS = ['-mfloat-abi=sort']
+    _EXTRA_ASFLAGS = ['-mfloat-abi=soft']
     _EXTRA_CCFLAGS = ['-DCORTEX_M3', '-DCORE_M3', '-mfloat-abi=soft']
     freertos_port = 'ARM_CM3'
     rtx_irq_port = 'irq_cm3'

@@ -527,7 +527,7 @@ class VEnvironment(Environment):
         self.appendPath( ['/libFatFs/source'] )
         self.appendGlobSource( ['/libFatFs/source/*.c'] )
    
-    def appendFreertos( self, heap=3 ):
+    def appendFreeRTOS( self, heap=3 ):
         self.appendPath( [
             '/libFreeRTOS',
             '/libFreeRTOS/include',
@@ -570,7 +570,7 @@ class config():
     # these configurations are treated as keyword arguments when import halXXX/config.py
     append_mcush = True
     append_hal = True
-    append_freertos = True
+    append_rtos = 'FreeRTOS'
     use_vfs = True
     use_romfs = True
     use_fcfs = None
@@ -625,11 +625,19 @@ def loadHalConfig( haldir, *args, **kwargs ):
         config.env.appendHal( haldir, hal_config.paths, hal_config.sources )
     if hal_config.append_mcush:
         config.env.appendMcush()
-    if hal_config.append_freertos:
-        if hal_config.freertos_heap is None:
-            config.env.appendFreertos()
-        else:
-            config.env.appendFreertos(heap=hal_config.freertos_heap)
+    if hal_config.append_rtos:
+        if hal_config.append_rtos == 'FreeRTOS':
+            config.env.appendDefineFlags(['MCUSH_OS=OS_FREERTOS'])
+            if hal_config.freertos_heap is None:
+                config.env.appendFreeRTOS()
+            else:
+                config.env.appendFreeRTOS(heap=hal_config.freertos_heap)
+        elif hal_config.append_rtos == 'RTX':
+            config.env.appendDefineFlags(['MCUSH_OS=OS_RTX'])
+            config.env.appendRTX()
+        elif hal_config.append_rtos == 'RTTHREAD':
+            # TODO: add rtthread source codes
+            pass
     # apply vfs related
     config.env.appendDefineFlags( [ 'MCUSH_VFS=%d'% int(bool(hal_config.use_vfs)) ] )
     if hal_config.use_vfs:
