@@ -49,6 +49,8 @@ class VEnvironment(Environment):
     # default flags
     _DEF_ASFLAGS = []
     _DEF_CCFLAGS = ['-Wno-unused-but-set-variable', '-Wall',
+                    '-Wno-error=attributes',
+                    #'-Wno-error=stringop-truncation',
                     #'-pedantic',
                     '-std=c99',
                     '-fno-strict-aliasing',
@@ -77,6 +79,9 @@ class VEnvironment(Environment):
         '-D__GNUC__=4',
         '-D__builtin_va_list=int',
         ]
+
+    _optimize_level = None
+
 
     def _initFromSysEnv( self ):
         self.VERBOSE = getBoolEnv( 'VERBOSE' )
@@ -320,11 +325,19 @@ class VEnvironment(Environment):
         '''make application'''
         generateBuildSignatureFile()
 
+        # optimize flags and defination 
+        self.appendCompilerFlag(['-g', '-Werror'])
+        if self._optimize_level is None:
+            self._optimize_level = 'O0' if self.DEBUG else 'O2'
+        self.appendCompilerFlags(['-%s'% self._optimize_level])
+        if self.DEBUG:
+            self.appendDefineFlags(['DEBUG'])
+        else:
+            self.appendDefineFlags(['NDEBUG'])
+
+
+        # splint
         self.prepareLintEnv()
-        try:
-            self._optimize_flags_added
-        except AttributeError:
-            self.appendOptimizeFlags()
         if self.linkfile:
             linkfile_dir = dirname(self.linkfile)
             if linkfile_dir:
@@ -427,25 +440,9 @@ class VEnvironment(Environment):
             self.Append(BUILDERS = {'MarkdownLandSlideHtml': self.builder_md_landslide_html})
         base = splitext(fname)[0]
         self.MarkdownLandSlideHtml( target='%s.html'% base, source='%s.md'% base )
-
-    def appendOptimizeFlags( self, optimize_flags=None, define_flags=None ):
-        if optimize_flags is None:
-            if self.DEBUG:
-                optimize_flags = ['-g', '-O0', '-Werror']
-            else:
-                optimize_flags = ['-g', '-O3', '-Werror']
-            optimize_flags += [
-                '-Wno-error=attributes',
-                #'-Wno-error=stringop-truncation',
-                ]
-        self.appendCompilerFlag(optimize_flags)
-        self._optimize_flags_added = True
-        if define_flags is None:
-            if self.DEBUG:
-                define_flags = ['DEBUG']
-            else:
-                define_flags = ['NDEBUG']
-        self.appendDefineFlags(define_flags)
+    def setOptimizeLevel( self, level ):
+        assert level in ['O0','O1','O2','O3','Os']
+        self._optimize_level = level
 
     def appendDefineFlags( self, define_flags=None ):
         if define_flags is None:
@@ -626,7 +623,8 @@ def loadHalConfig( haldir, *args, **kwargs ):
     if hal_config.append_mcush:
         config.env.appendMcush()
     if hal_config.append_rtos:
-        if hal_config.append_rtos == 'FreeRTOS':
+        hal_config.append_rtos = hal_config.append_rtos.strip().upper()
+        if hal_config.append_rtos == 'FREERTOS':
             config.env.appendDefineFlags(['MCUSH_OS=OS_FREERTOS'])
             if hal_config.freertos_heap is None:
                 config.env.appendFreeRTOS()
@@ -635,9 +633,12 @@ def loadHalConfig( haldir, *args, **kwargs ):
         elif hal_config.append_rtos == 'RTX':
             config.env.appendDefineFlags(['MCUSH_OS=OS_RTX'])
             config.env.appendRTX()
+        elif hal_config.append_rtos == 'THREADX':
+            config.env.appendDefineFlags(['MCUSH_OS=OS_THREADX'])
+            # TODO: add source codes
         elif hal_config.append_rtos == 'RTTHREAD':
-            # TODO: add rtthread source codes
-            pass
+            config.env.appendDefineFlags(['MCUSH_OS=OS_RTTHREAD'])
+            # TODO: add source codes
     # apply vfs related
     config.env.appendDefineFlags( [ 'MCUSH_VFS=%d'% int(bool(hal_config.use_vfs)) ] )
     if hal_config.use_vfs:
