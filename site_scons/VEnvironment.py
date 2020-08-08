@@ -48,13 +48,33 @@ class VEnvironment(Environment):
 
     # default flags
     _DEF_ASFLAGS = []
-    _DEF_CCFLAGS = ['-Wno-unused-but-set-variable', '-Wall',
+    _DEF_CCFLAGS = ['-std=c99', '-Wall',
+                    #'-fmax-errors=10',
                     '-Wno-error=attributes',
+                    '-Wextra',
+                        #'-Wunused-but-set-variable', 
+                        #'-Wunused-parameter',
+                        #'-Wmaybe-uninitialized',
+                        '-Wno-missing-field-initializers', 
+                    '-Wformat=2',
+                    '-Wformat-nonliteral',
+                    #'-Wcast-align',
+                    #'-Wsign-conversion',
+                    #'-Wconversion',
+                    '-Wfloat-conversion',
+                    '-Wfloat-equal',
+                    '-Wsign-compare',
+                    #'-Wcast-qual',
+                    #'-Wmissing-prototypes',
+                    #'-Wsign-conversion',
+                    #'-Wmissing-field-initializers', 
+                    #'-Wundef',
                     #'-Wno-error=stringop-truncation',
-                    #'-pedantic',
-                    '-std=c99',
+                    #'-pedantic', 
+                    #'-Wdeclaration-after-statement',
                     '-fno-strict-aliasing',
-                    '-ffunction-sections', '-fdata-sections']
+                    '-ffunction-sections',
+                    '-fdata-sections']
     _DEF_CPPPATH = []
     _DEF_LIBPATH = []
     _DEF_LIBS = ['m']
@@ -323,9 +343,14 @@ class VEnvironment(Environment):
 
     def makeApp( self, name=None ):
         '''make application'''
+        if not name:
+            name = self.getName()
+        self.prepareLintEnv()
+
+        # generate .build_signature file that contains "build date/time" 
         generateBuildSignatureFile()
 
-        # optimize flags and defination 
+        # compiler optimize flags and defination 
         self.appendCompilerFlag(['-g', '-Werror'])
         if self._optimize_level is None:
             self._optimize_level = 'O0' if self.DEBUG else 'O2'
@@ -334,10 +359,8 @@ class VEnvironment(Environment):
             self.appendDefineFlags(['DEBUG'])
         else:
             self.appendDefineFlags(['NDEBUG'])
-
-
-        # splint
-        self.prepareLintEnv()
+       
+        # set link file (.ld)
         if self.linkfile:
             linkfile_dir = dirname(self.linkfile)
             if linkfile_dir:
@@ -346,10 +369,11 @@ class VEnvironment(Environment):
             self.appendLinkFlag( ['-Wl,-T%s'% self.linkfile] )
             
         #self.appendCompilerFlag( ['-DBUILD_DATE=%s'% self.BUILD_DATE] )
-            
-        if not name:
-            name = self.getName()
+         
+        # output map file
         self.appendLinkFlag( ['-Wl,--Map=%s.map'% name] )
+
+        # build source files
         objs = []
         for sfile in self.source:
             obj = self.Object(sfile)
@@ -375,9 +399,10 @@ class VEnvironment(Environment):
         self.AlwaysBuild( self.Alias('name', [], 'echo %s'% pathname) )
 
     def makeLib( self, name=None ):
-        self.prepareLintEnv()
         if not name:
             name = self.getName()
+        self.prepareLintEnv()
+        # sources files
         objs = []
         for sfile in self.source:
             obj = self.Object(sfile)
