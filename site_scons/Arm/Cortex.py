@@ -4,8 +4,8 @@ from Toolchain import Gcc
 from VEnvironment import VEnvironment, Driver, hal_config
 
 class ArmNoneEabiGcc(Gcc):
-    #PREFIX = '/usr/bin/arm-none-eabi-'
     PREFIX = 'arm-none-eabi-'
+    #PREFIX = '/usr/bin/arm-none-eabi-'
 
 
 

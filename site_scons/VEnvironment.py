@@ -53,7 +53,7 @@ class VEnvironment(Environment):
                     '-Wno-error=attributes',
                     '-Wextra',
                         #'-Wunused-but-set-variable', 
-                        #'-Wunused-parameter',
+                        #'-Wno-unused-parameter',
                         #'-Wmaybe-uninitialized',
                         '-Wno-missing-field-initializers', 
                     '-Wformat=2',
@@ -63,7 +63,7 @@ class VEnvironment(Environment):
                     #'-Wconversion',
                     '-Wfloat-conversion',
                     '-Wfloat-equal',
-                    '-Wsign-compare',
+                    #'-Wno-sign-compare',
                     #'-Wcast-qual',
                     #'-Wmissing-prototypes',
                     #'-Wsign-conversion',
@@ -572,7 +572,17 @@ class VEnvironment(Environment):
             '/libRTX/*.c',
             '/libRTX/GCC/%s.s'% self.rtx_irq_port,
             ] )
-      
+
+    def appendRTThread( self ):
+        self.appendPath( [
+            '/libRTThread/include',
+            ] )
+        self.appendGlobSource( [
+            '/libRTThread/src/*.c',
+            '/libRTThread/libcpu/arm/%s/*.c'% self._MCPU,
+            '/libRTThread/libcpu/arm/%s/context_gcc.S'% self._MCPU,
+            ] )
+       
     def appendHal( self, haldir, paths=None, sources=None ):
         self.appendPath( ['/hal%s'% haldir] )
         self.appendGlobSource( ['/hal%s/*.c'% haldir] )
@@ -663,7 +673,7 @@ def loadHalConfig( haldir, *args, **kwargs ):
             # TODO: add source codes
         elif hal_config.append_rtos == 'RTTHREAD':
             config.env.appendDefineFlags(['MCUSH_OS=OS_RTTHREAD'])
-            # TODO: add source codes
+            config.env.appendRTThread()
     # apply vfs related
     config.env.appendDefineFlags( [ 'MCUSH_VFS=%d'% int(bool(hal_config.use_vfs)) ] )
     if hal_config.use_vfs:
