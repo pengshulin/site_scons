@@ -47,7 +47,8 @@ class VEnvironment(Environment):
     _TOOLCHAIN = Gcc
 
     # default flags
-    _DEF_ASFLAGS = []
+    _DEF_ASFLAGS = ['-g']
+    _DEF_ASPPFLAGS = []
     _DEF_CCFLAGS = ['-std=c99', '-Wall',
                     #'-fmax-errors=10',
                     '-Wno-error=attributes',
@@ -63,7 +64,7 @@ class VEnvironment(Environment):
                     #'-Wconversion',
                     '-Wfloat-conversion',
                     '-Wfloat-equal',
-                    #'-Wno-sign-compare',
+                    '-Wno-sign-compare',
                     #'-Wcast-qual',
                     #'-Wmissing-prototypes',
                     #'-Wsign-conversion',
@@ -84,6 +85,7 @@ class VEnvironment(Environment):
 
     # additional flags
     _ASFLAGS = []
+    _ASPPFLAGS = []
     _CCFLAGS = []
     _CPPPATH = []
     _LIBPATH = []
@@ -134,6 +136,7 @@ class VEnvironment(Environment):
         self['OBJDUMP'] = tool.OBJDUMP
 
         self.Append( ASFLAGS=self._DEF_ASFLAGS )
+        self.Append( ASPPFLAGS=self._DEF_ASPPFLAGS )
         self.Append( CCFLAGS=self._DEF_CCFLAGS )
         self.Append( CPPPATH=self._DEF_CPPPATH )
         self.Append( LIBS=self._DEF_LIBS )
@@ -141,6 +144,7 @@ class VEnvironment(Environment):
         self.Append( LINKFLAGS=self._DEF_LINKFLAGS )
 
         self.Append( ASFLAGS=self._ASFLAGS )
+        self.Append( ASPPFLAGS=self._ASPPFLAGS )
         self.Append( CCFLAGS=self._CCFLAGS )
         self.Append( CPPPATH=self._CPPPATH )
         if self._LIBS:
@@ -270,7 +274,7 @@ class VEnvironment(Environment):
     def setName( self, name ):
         self.name = name
 
-    def getName( self ):
+    def getName( self, append_debug=True ):
         if self.name:
             return self.name
         dirname = basename(getcwd())
@@ -280,7 +284,10 @@ class VEnvironment(Environment):
             name = dirname[3:]
         else:
             name = dirname
-        return name + '_dbg' if self.DEBUG else name
+        if append_debug and self.DEBUG:
+            return name + '_dbg'
+        else:
+            return name
 
     def setLinkfile( self, linkfile ):
         '''set link file'''
@@ -341,6 +348,15 @@ class VEnvironment(Environment):
     #        #self.Depends( l, sfile )
     #        #self.lint_list.append( l )
 
+    def dumpEnv( self, key=None ):
+        import pprint
+        pp = pprint.PrettyPrinter( indent = 2 )
+        if key:
+            dict = self.Dictionary( key )
+        else:
+            dict = self.Dictionary()
+        pp.pprint( dict )
+    
     def makeApp( self, name=None ):
         '''make application'''
         if not name:

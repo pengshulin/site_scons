@@ -5,7 +5,7 @@ from VEnvironment import VEnvironment, Driver, hal_config
 
 class ArmNoneEabiGcc(Gcc):
     PREFIX = 'arm-none-eabi-'
-    #PREFIX = '/usr/bin/arm-none-eabi-'
+    PREFIX = '/usr/bin/arm-none-eabi-'
 
 
 
@@ -14,6 +14,7 @@ class Cortex(VEnvironment):
     _TOOLCHAIN = ArmNoneEabiGcc
     _MCPU = None
     _ASFLAGS = []
+    _ASPPFLAGS = []
     _CCFLAGS = []
     _CPPPATH = []
     _LIBPATH = []
@@ -67,7 +68,8 @@ class CortexM3(Cortex):
 
 class CortexM4(Cortex):
     _MCPU = 'cortex-m4'
-    _EXTRA_ASFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16' ]
+    _EXTRA_ASFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
+    _ASPPFLAGS = ['-Wa,-mimplicit-it=thumb']
     _EXTRA_CCFLAGS = ['-DCORTEX_M4', '-DCORE_M4', '-mfloat-abi=hard', '-mfpu=fpv4-sp-d16', ]
     _EXTRA_LINKFLAGS = ['-mfloat-abi=hard', '-mfpu=fpv4-sp-d16', ]
     freertos_port = 'ARM_CM4F'

@@ -6,6 +6,15 @@ from binascii import hexlify
 
 _SWITCH_CONFIRM = ['1', 'Y', 'y', 'T', 't', 'yes', 'Yes', 'YES', 'true', 'True', 'TRUE']
 
+def getEnv( name, default='' ):
+    return getenv(name, default)
+
+def getIntEnv( name, default='0' ):
+    return int(getenv(name, default))
+
+def getFloatEnv( name, default='0.0' ):
+    return int(getenv(name, default))
+
 def getBoolEnv( name ):
     return bool( getenv(name) in _SWITCH_CONFIRM )
 
