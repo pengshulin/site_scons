@@ -10,7 +10,7 @@ from Utils import *
 import Utils
 
 from os import environ, getenv, getcwd, system
-from os.path import basename, abspath, isfile, join, splitext, dirname
+from os.path import basename, abspath, isdir, isfile, join, splitext, dirname
 from fnmatch import fnmatchcase
 from time import strftime
 from sys import path as sys_path
@@ -280,8 +280,12 @@ class VEnvironment(Environment):
         dirname = basename(getcwd())
         if dirname.startswith('app'):
             name = dirname[3:]
+            if name == '':
+                name = 'app'  # use simple name: app
         elif dirname.startswith('lib'):
             name = dirname[3:]
+            if name == '':
+                raise Exception('lib not named')
         else:
             name = dirname
         if append_debug and self.DEBUG:
@@ -600,11 +604,12 @@ class VEnvironment(Environment):
             ] )
        
     def appendHal( self, haldir, paths=None, sources=None ):
-        self.appendPath( ['/hal%s'% haldir] )
-        self.appendGlobSource( ['/hal%s/*.c'% haldir] )
         if paths:
             for p in paths:
-                self.appendPath( ['/hal%s/%s'% (haldir, p)] )
+                if p == '':
+                    self.appendPath( ['/hal%s'% haldir] )
+                else:
+                    self.appendPath( ['/hal%s/%s'% (haldir, p)] )
         if sources:
             for s in sources:
                 self.appendGlobSource( ['/hal%s/%s'% (haldir, s)] )
@@ -612,9 +617,9 @@ class VEnvironment(Environment):
  
 haldir = getenv('HALDIR', None) 
     
-class config():
-    paths = []
-    sources = []
+class _config():
+    paths = ['']
+    sources = ['*.c']
     # these configurations are treated as keyword arguments when import halXXX/config.py
     append_mcush = True
     append_hal = True
@@ -634,7 +639,7 @@ class config():
             return None
     
 
-hal_config = config()
+hal_config = _config()
 
 # called from SConstruct
 # search in 'halXXXXX' directory for 'config.py'
@@ -649,10 +654,12 @@ def loadHalConfig( haldir, *args, **kwargs ):
     root = _findRoot()
     if root is None:
         raise Exception("ROOT not defined")
+    config_dir = join(root, 'hal'+haldir)
+    if not isdir(config_dir):
+        raise Exception("haldir %s not exists"% config_dir)
     config = join(root, 'hal'+haldir, 'config.py')
     if not isfile(config):
-        msg = "config.py not exists in %s"% haldir
-        raise Exception(msg)
+        raise Exception("config.py not exists in %s"% haldir)
     # append to path so that config.py can be imported
     sys.path.append(join(root, 'hal'+haldir) )
     # prepare hal_config global variable for import
@@ -675,6 +682,8 @@ def loadHalConfig( haldir, *args, **kwargs ):
         config.env.appendMcush()
     if hal_config.append_rtos:
         hal_config.append_rtos = hal_config.append_rtos.strip().upper()
+        if hal_config.append_rtos == 'NONE':
+            config.env.appendDefineFlags(['MCUSH_OS=OS_NONE'])
         if hal_config.append_rtos == 'FREERTOS':
             config.env.appendDefineFlags(['MCUSH_OS=OS_FREERTOS'])
             if hal_config.freertos_heap is None:
