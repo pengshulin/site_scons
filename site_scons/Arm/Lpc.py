@@ -18,7 +18,8 @@ class Lpc43xx_StartupDriver(Driver):
             '/NXP/startup/sysinit.c', ]
 
 class Lpc43xx_ChipDriver(Driver):
-    PATH = ['/NXP/lpcopen/lpc_chip_43xx/inc']
+    PATH = ['/NXP/lpcopen/lpc_chip_43xx/inc',
+            '/NXP/lpcopen/lpc_chip_43xx/inc/config_43xx' ]
     GLOBSOURCE = ['/NXP/lpcopen/lpc_chip_43xx/src/*.c']
 
 
@@ -31,6 +32,9 @@ class Lpc4337(Lpc43xx):
         if chip_driver:
             drivers.append( Lpc43xx_ChipDriver() )
         Lpc43xx.__init__( self, drivers=drivers )
+        self.appendCompilerFlag( ['-D__NVIC_PRIO_BITS=3'] )
+        self.appendCompilerFlag( ['-D__USE_LPCOPEN'] )
+
 
 
 class Lpc4337m0(CortexM0):
