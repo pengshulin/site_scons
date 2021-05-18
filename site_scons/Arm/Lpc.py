@@ -32,6 +32,7 @@ class Lpc4337(Lpc43xx):
         if chip_driver:
             drivers.append( Lpc43xx_ChipDriver() )
         Lpc43xx.__init__( self, drivers=drivers )
+        #self.appendCompilerFlag( ['-D__CHECK_DEVICE_DEFINES=1'] )
         self.appendCompilerFlag( ['-D__NVIC_PRIO_BITS=3'] )
         self.appendCompilerFlag( ['-D__USE_LPCOPEN'] )
 

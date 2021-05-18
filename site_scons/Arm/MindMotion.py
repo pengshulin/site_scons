@@ -16,12 +16,28 @@ class MM32F0_StartupDriver(Driver):
         self.CFLAG.append( '-D%s'% mcu_class )
         self.LDFLAG = ['-Wl,--entry=__vector_table'] 
 
+class MM32F103_StartupDriver(Driver):
+    PATH = ['/MindMotion/mm32f103/Include']
+    def __init__(self, mcu_class):
+        self.SOURCE = [
+            '/MindMotion/mm32f103/Source/startup_mm32.c',
+            '/MindMotion/mm32f103/Source/system_MM32F103.c' ]
+        self.CFLAG = []
+        self.CFLAG.append( '-D%s'% mcu_class )
+        self.LDFLAG = ['-Wl,--entry=__vector_table'] 
+
+
 
 # HAL lib
 class MM32F0_HAL_lib(Driver):
     PATH = ['/MindMotion/mm32f0/HAL_lib/inc']
     GLOBSOURCE = ['/MindMotion/mm32f0/HAL_lib/*.c']
     CFLAG = []
+
+class MM32F103_HAL_lib(Driver):
+    PATH = ['/MindMotion/mm32f103/HAL_lib/inc']
+    GLOBSOURCE = ['/MindMotion/mm32f103/HAL_lib/src/*.c']
+    CFLAG = ['-DUSE_STDPERIPH_DRIVER']
 
 
 
@@ -45,11 +61,23 @@ class MM32M3(CortexM3):
 # __MM0P1  Cortex-M0  MM32SPIN2x  
 # __MM0Q1  Cortex-M0  MM32F003 / MM32F031x4,x6  
 
-# MMM32F031x8
+# MM32F031x8
 class MM32F031x8(MM32M0):
     def __init__(self):
         MM32M0.__init__( self, drivers=[
             MM32F0_StartupDriver('__MM0N1'),
             MM32F0_HAL_lib() ] )
+
+# MM32F103x8
+class MM32F103x8(MM32M3):
+    def __init__(self):
+        MM32M3.__init__( self, drivers=[
+            #MM32F103_StartupDriver('__MM3N1'),
+            #MM32F103_HAL_lib() ] )
+            MM32F0_StartupDriver('__MM3N1'),
+            MM32F0_HAL_lib() ] )
+        # NOTE: irq priority write/read does not match when PRIO_BITS is set 4
+        # so use PRIO_BITS=3 instead, confirm PriorityGroup is also configured
+        self.appendCompilerFlag( ['-D__NVIC_PRIO_BITS=3'] )
 
 
