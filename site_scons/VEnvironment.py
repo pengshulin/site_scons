@@ -243,7 +243,11 @@ class VEnvironment(Environment):
             #print 'Expat:', exclude_pat
             ret = []
             for fil in result:
-                fname = unicode(fil)
+                fname = str(fil)
+                #if PYTHON_V3:
+                #    fname = str(fil)
+                #else:
+                #    fname = unicode(fil)
                 match = False
                 for p in exclude_pat:
                     if fnmatchcase( fname, p ):
@@ -558,8 +562,8 @@ class VEnvironment(Environment):
     appendDefinedFlags = appendDefineFlags
 
     def appendMcush( self ):
-        self.appendPath( ['/mcush'] )
-        self.appendGlobSource( ['/mcush/*.c'] )
+        self.appendPath( ['/mcush', '/mcush/service'] )
+        self.appendGlobSource( ['/mcush/*.c', '/mcush/service/*.c'] )
   
     def appendSpiffs( self ):
         self.appendPath( ['/libspiffs'] )

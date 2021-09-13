@@ -2,6 +2,7 @@
 from time import strftime
 from os import getenv
 from binascii import hexlify
+from sys import platform, version_info
 
 
 _SWITCH_CONFIRM = ['1', 'Y', 'y', 'T', 't', 'yes', 'Yes', 'YES', 'true', 'True', 'TRUE']
@@ -35,4 +36,5 @@ def getStringDescriptor(desc):
     wdesc = chars2wchars(desc)
     return chr(len(wdesc)+2) + chr(3) + wdesc
 
+PYTHON_V3 = bool(version_info > (3,0))
 

@@ -182,9 +182,15 @@ class STM32_USB_DEVICE_Driver(Driver):
     PATH = ['/ST/STM32_USB_Device_Library/Core/Inc']
     GLOBSOURCE = ['/ST/STM32_USB_Device_Library/Core/Src/usbd_*.c']
     GLOBSOURCE_EX = ['/ST/STM32_USB_Device_Library/Core/Src/usbd_*template.c']
-    def __init__(self):
-        self.PATH.append('/ST/STM32_USB_Device_Library/Class/%s/Inc'% self.CLASS)
-        self.SOURCE.append('/ST/STM32_USB_Device_Library/Class/%s/Src/usbd_%s.c'% (self.CLASS, self.CLASS.lower()) )
+    def __init__(self, dev_class=None):
+        if dev_class is None:
+            try:
+                dev_class = self.CLASS
+            except:
+                pass
+        if dev_class is not None:
+            self.PATH.append('/ST/STM32_USB_Device_Library/Class/%s/Inc'% dev_class)
+            self.SOURCE.append('/ST/STM32_USB_Device_Library/Class/%s/Src/usbd_%s.c'% (dev_class, dev_class.lower()) )
 
 class STM32_USB_DEVICE_AUDIO_Driver(STM32_USB_DEVICE_Driver):
     CLASS = 'AUDIO'
