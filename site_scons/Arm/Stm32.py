@@ -100,6 +100,33 @@ class STM32F7XX_StartupDriver(Driver):
         self.CFLAG.append( '-D%s'% cpu )
         self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
+class STM32G0XX_StartupDriver(Driver):
+    PATH = ['/CMSIS/Device/ST/STM32G0xx/Include']
+    EX_DEF = {
+        'STM32G0B0xx': 'STM32G0B0xx',
+        'STM32G0B1xx': 'STM32G0B1xx',
+        'STM32G0C1xx': 'STM32G0C1xx',
+        'STM32G070xx': 'STM32G070xx',
+        'STM32G071xx': 'STM32G071xx',
+        'STM32G081xx': 'STM32G081xx',
+        'STM32G050xx': 'STM32G050xx',
+        'STM32G051xx': 'STM32G051xx',
+        'STM32G061xx': 'STM32G061xx',
+        'STM32G030xx': 'STM32G030xx',
+        'STM32G031xx': 'STM32G031xx',
+        'STM32G041xx': 'STM32G041xx',
+        }
+
+    def __init__(self, cpu):
+        self.SOURCE = [
+            '/CMSIS/Device/ST/STM32G0xx/Source/Templates/gcc/startup_%s.s'% cpu.lower(), 
+            '/CMSIS/Device/ST/STM32G0xx/Source/Templates/system_stm32g0xx.c' ]
+        self.CFLAG = []
+        self.CFLAG.append( '-D%s'% cpu )
+        if cpu in self.EX_DEF.keys():
+            self.CFLAG.append( '-D%s'% self.EX_DEF[cpu] )
+        self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
+
 
 # Standard Peripheral driver
 class STM32F0XX_StdPeripheralDriver(Driver):
@@ -147,6 +174,12 @@ class STM32F7XX_HAL_Driver(Driver):
     GLOBSOURCE_EX = ['/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_*template.c']
     CFLAG = ['-DUSE_HAL_DRIVER', '-DUSE_FULL_LL_DRIVER']
 
+class STM32G0XX_HAL_Driver(Driver):
+    PATH = ['/ST/STM32G0xx_HAL_Driver/Inc']
+    GLOBSOURCE = ['/ST/STM32G0xx_HAL_Driver/Src/stm32g0xx_*.c']
+    GLOBSOURCE_EX = ['/ST/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_*template.c']
+    CFLAG = ['-DUSE_HAL_DRIVER', '-DUSE_FULL_LL_DRIVER']
+
 
 # LL-only Driver
 class STM32F1XX_LL_Driver(Driver):
@@ -169,6 +202,14 @@ class STM32F7XX_LL_Driver(Driver):
                   '/ST/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.c', 
                  ]
     CFLAG = ['-DUSE_FULL_LL_DRIVER']
+
+class STM32G0XX_LL_Driver(Driver):
+    PATH = ['/ST/STM32G0xx_HAL_Driver/Inc']
+    GLOBSOURCE = ['/ST/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll*.c',
+                  '/ST/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_cortex.c',
+                  ]
+    CFLAG = ['-DUSE_FULL_LL_DRIVER']
+
 
 
 # USB Full Speed driver
@@ -447,5 +488,16 @@ class Stm32f7(Stm32M7):
 
 class Stm32f767xx(Stm32f7):
     cpu = 'STM32F767xx'
+
+
+# STM32G0xx
+class Stm32g0(Stm32M0):
+    def __init__(self):
+        Stm32M0.__init__( self, drivers=[
+            STM32G0XX_StartupDriver(self.cpu),
+            STM32G0XX_LL_Driver() ] )
+
+class Stm32g030xx(Stm32g0):
+    cpu = 'STM32G030xx'
 
 
