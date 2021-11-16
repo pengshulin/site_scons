@@ -433,7 +433,7 @@ class Stm32f2(Stm32M3):
     def __init__(self, use_hal_driver=False):
         if use_hal_driver:
             drivers = [ STM32F2XX_StartupDriver(),
-                        STM32F2XX__HAL_Driver() ]
+                        STM32F2XX_HAL_Driver() ]
         else:
             drivers = [ STM32F2XX_StartupDriver(),
                         STM32F2XX_StdPeripheralDriver() ]
@@ -495,7 +495,7 @@ class Stm32g0(Stm32M0):
     def __init__(self):
         Stm32M0.__init__( self, drivers=[
             STM32G0XX_StartupDriver(self.cpu),
-            STM32G0XX_LL_Driver() ] )
+            STM32G0XX_HAL_Driver() ] )
 
 class Stm32g030xx(Stm32g0):
     cpu = 'STM32G030xx'
