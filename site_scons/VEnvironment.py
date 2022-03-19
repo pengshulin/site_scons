@@ -628,6 +628,7 @@ class _config():
     append_mcush = True
     append_hal = True
     append_rtos = 'FreeRTOS'
+    use_shell = True
     use_vfs = True
     use_romfs = True
     use_fcfs = None
@@ -714,6 +715,9 @@ def loadHalConfig( haldir, *args, **kwargs ):
             config.env.appendSpiffs()
         if hal_config.use_fatfs:
             config.env.appendFatfs()
+    # NO_SHELL mode (compact mode for minimum resource)
+    if not hal_config.use_shell:
+        config.env.appendDefineFlags( [ 'NO_SHELL=1' ] )
     return config
 
 
