@@ -49,7 +49,8 @@ class VEnvironment(Environment):
     # default flags
     _DEF_ASFLAGS = ['-g']
     _DEF_ASPPFLAGS = []
-    _DEF_CCFLAGS = ['-std=c99', '-Wall',
+    _DEF_CCFLAGS = ['-std=c99',
+                    '-Wall',
                     #'-fmax-errors=10',
                     '-Wno-error=attributes',
                     '-Wextra',
@@ -606,7 +607,13 @@ class VEnvironment(Environment):
             '/libRTThread/libcpu/arm/%s/*.c'% self._MCPU,
             '/libRTThread/libcpu/arm/%s/context_gcc.S'% self._MCPU,
             ] )
-       
+    
+    def appendPosix( self ):
+        self.appendCompilerFlag( ['-pthread'] )
+        self.appendLinkFlag( ['-pthread'] )
+        self['CCFLAGS'].remove('-std=c99')
+        self.Append( LIBS=['rt'] )
+        
     def appendHal( self, haldir, paths=None, sources=None ):
         if paths:
             for p in paths:
@@ -704,6 +711,10 @@ def loadHalConfig( haldir, *args, **kwargs ):
         elif hal_config.append_rtos == 'RTTHREAD':
             config.env.appendDefineFlags(['MCUSH_OS=OS_RTTHREAD'])
             config.env.appendRTThread()
+        elif hal_config.append_rtos == 'POSIX':
+            config.env.appendDefineFlags(['MCUSH_OS=OS_POSIX'])
+            config.env.appendPosix()
+            
     # apply vfs related
     config.env.appendDefineFlags( [ 'MCUSH_VFS=%d'% int(bool(hal_config.use_vfs)) ] )
     if hal_config.use_vfs:
