@@ -609,11 +609,22 @@ class VEnvironment(Environment):
             ] )
     
     def appendPosix( self ):
+        self.appendCompilerFlag( ['-DMCUSH_POSIX=1'] )
         self.appendCompilerFlag( ['-pthread'] )
         self.appendLinkFlag( ['-pthread'] )
         self['CCFLAGS'].remove('-std=c99')
         self.Append( LIBS=['rt'] )
         
+    def appendThreadX( self, port=None ):
+        self.appendCompilerFlag( ['-DTX_INCLUDE_USER_DEFINE_FILE'] )
+        self.appendPath( [ '/libThreadX/common/inc', ] )
+        self.appendGlobSource( [ '/libThreadX/common/src/*.c', ] )
+        if port is not None:
+            self.appendPath( [ '/libThreadX/ports/%s/gnu/inc'% port, ] )
+            self.appendGlobSource( [ '/libThreadX/ports/%s/gnu/src/*.S'% port, ] )
+            self.appendGlobSource( [ '/libThreadX/ports/%s/gnu/example_build/*.S'% port, ] )
+
+  
     def appendHal( self, haldir, paths=None, sources=None ):
         if paths:
             for p in paths:
@@ -707,7 +718,19 @@ def loadHalConfig( haldir, *args, **kwargs ):
             config.env.appendRTX()
         elif hal_config.append_rtos == 'THREADX':
             config.env.appendDefineFlags(['MCUSH_OS=OS_THREADX'])
-            # TODO: add source codes
+            from Arm.Cortex import CortexM0, CortexM3, CortexM4, CortexM7
+            if isinstance(config.env, CortexM0):
+                config.env.appendThreadX(port='cortex_m0')
+            elif isinstance(config.env, CortexM3):
+                config.env.appendThreadX(port='cortex_m3')
+            elif isinstance(config.env, CortexM4):
+                config.env.appendThreadX(port='cortex_m4')
+                config.env.appendCompilerFlag( ['-DTX_ENABLE_FPU_SUPPORT'] )
+            elif isinstance(config.env, CortexM7):
+                config.env.appendThreadX(port='cortex_m7')
+                config.env.appendCompilerFlag( ['-DTX_ENABLE_FPU_SUPPORT'] )
+            else:
+                config.env.appendThreadX()
         elif hal_config.append_rtos == 'RTTHREAD':
             config.env.appendDefineFlags(['MCUSH_OS=OS_RTTHREAD'])
             config.env.appendRTThread()

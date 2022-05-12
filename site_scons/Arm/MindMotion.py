@@ -14,7 +14,7 @@ class MM32F0_StartupDriver(Driver):
             '/MindMotion/mm32f0/startup/system_mm32.c' ]
         self.CFLAG = []
         self.CFLAG.append( '-D%s'% mcu_class )
-        self.LDFLAG = ['-Wl,--entry=__vector_table'] 
+        self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
 class MM32F103_StartupDriver(Driver):
     PATH = ['/MindMotion/mm32f103/Include']
@@ -24,7 +24,7 @@ class MM32F103_StartupDriver(Driver):
             '/MindMotion/mm32f103/Source/system_MM32F103.c' ]
         self.CFLAG = []
         self.CFLAG.append( '-D%s'% mcu_class )
-        self.LDFLAG = ['-Wl,--entry=__vector_table'] 
+        self.LDFLAG = ['-Wl,--entry=Reset_Handler'] 
 
 
 
