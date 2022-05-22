@@ -410,15 +410,16 @@ class VEnvironment(Environment):
                     self.AddPostAction(obj, self.splint_cmd)
          
         self.elffile = self.Program( name + '.elf', objs )
-        self.binfile = self.Bin( name + '.bin', self.elffile )
-        self.hexfile = self.Hex( name + '.hex', self.elffile )
-        self.lstfile = self.Dump( name + '.lst', self.elffile )
-        #self.mapfile = self.Map( name + '.map', self.elffile )
-        self.Depends( self.binfile, self.elffile )
-        self.Depends( self.hexfile, self.elffile )
-        self.Depends( self.lstfile, self.elffile )
-        #self.Depends( self.mapfile, self.elffile )
         self.Size( source=self.elffile )
+        self.lstfile = self.Dump( name + '.lst', self.elffile )
+        self.Depends( self.lstfile, self.elffile )
+        #self.mapfile = self.Map( name + '.map', self.elffile )
+        #self.Depends( self.mapfile, self.elffile )
+        if self.rtos != 'POSIX':
+            self.binfile = self.Bin( name + '.bin', self.elffile )
+            self.hexfile = self.Hex( name + '.hex', self.elffile )
+            self.Depends( self.binfile, self.elffile )
+            self.Depends( self.hexfile, self.elffile )
         # append name target
         pathname = join(getcwd(), basename(name))
         self.AlwaysBuild( self.Alias('name', [], 'echo %s'% pathname) )
@@ -705,6 +706,7 @@ def loadHalConfig( haldir, *args, **kwargs ):
         config.env.appendMcush()
     if hal_config.append_rtos:
         hal_config.append_rtos = hal_config.append_rtos.strip().upper()
+        config.env.rtos = hal_config.append_rtos
         if hal_config.append_rtos == 'NONE':
             config.env.appendDefineFlags(['MCUSH_OS=OS_NONE'])
         if hal_config.append_rtos == 'FREERTOS':
